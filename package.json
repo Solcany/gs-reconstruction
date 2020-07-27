@@ -1,0 +1,20 @@
+{
+  "name": "gs-reconstruction",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./js/main.js",
+  "dependencies": {
+    "browserify": "^16.5.1",
+    "esmify": "^2.1.1",
+    "watchify": "^3.11.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+	"watchify": "watchify ./js/main.js -o ./js-dist/bundle.js",
+	"browser-sync" : "browser-sync start --server --files 'index.html, ./js-dist/bundle.js'",
+    	"dev": "concurrently --kill-others \"npm run browser-sync\" \"npm run watchify\"",
+	"test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
