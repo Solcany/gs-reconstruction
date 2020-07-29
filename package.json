@@ -11,8 +11,8 @@
   "devDependencies": {},
   "scripts": {
 	"watchify": "watchify ./js/main.js -o ./js-dist/bundle.js",
-	"browser-sync" : "browser-sync start --server --files 'index.html, ./js-dist/bundle.js'",
-    	"dev": "concurrently --kill-others \"npm run browser-sync\" \"npm run watchify\"",
+	"browser-sync" : "browser-sync start --server --files 'index.html, ./js-dist/bundle.js, ./assets/scenes'",
+  "dev": "concurrently --kill-others \"npm run browser-sync\" \"npm run watchify\"",
 	"test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

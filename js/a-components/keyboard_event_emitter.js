@@ -32,8 +32,10 @@ AFRAME.registerComponent('keyboard-event-emitter', {
             }
             // Cancel the default action to avoid it being handled twice
             event.preventDefault();
-           
-            self.emit(event_to_emit);
+
+            //console.log("emitting key event: " + event_to_emit);
+
+            self.emit(event_to_emit,null,false);
         }, true);
   }
 });
