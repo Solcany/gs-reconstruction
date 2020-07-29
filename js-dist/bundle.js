@@ -1,4 +1,45 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+AFRAME.registerComponent('keyboard-event-emitter', {
+    init: function () {
+        const self = this.el;
+
+        window.addEventListener("keydown", function (event) {
+            if (event.defaultPrevented) {
+                return; // Do nothing if the event was already processed
+            }
+            const key = event.key || event.keyCode;
+
+            let event_to_emit;
+            switch (key) {
+            case "Down": event_to_emit = "key_down" // IE/EDGE
+            case "ArrowDown": event_to_emit = "key_down"
+                break;
+            case "Up": event_to_emit = "key_up"
+            case "ArrowUp": event_to_emit = "key_up"
+                break;
+            case "Left": event_to_emit = "key_left"
+            case "ArrowLeft": event_to_emit = "key_left"
+                break;
+            case "Right": event_to_emit = "key_right"
+            case "ArrowRight": event_to_emit = "key_right"
+                break;
+            // case "Enter":
+            //     break;
+            // case "Esc": // IE/Edge specific value
+            // case "Escape":
+            //     break;
+            default:
+                return; // Quit when this doesn't handle the key event.
+            }
+            // Cancel the default action to avoid it being handled twice
+            event.preventDefault();
+           
+            self.emit(event_to_emit);
+        }, true);
+  }
+});
+
+},{}],2:[function(require,module,exports){
 const PCDLoader = require("../libs/PCDLoader.js");
 
 
@@ -22,7 +63,7 @@ AFRAME.registerComponent('pcd-model', {
                     function (mesh) {
                         mesh.material.size = point_size
                         el.setObject3D('mesh', mesh)
-                     
+
                     },
 	                function ( xhr ) {
 		                console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
@@ -43,7 +84,38 @@ AFRAME.registerComponent('mouse-track', {
     }
 })
 
-},{"../libs/PCDLoader.js":2}],2:[function(require,module,exports){
+},{"../libs/PCDLoader.js":4}],3:[function(require,module,exports){
+AFRAME.registerComponent('scene-switcher', {
+    schema: {
+        scenes: {type: 'array', default: []}
+    },
+
+  init: function () {
+      this.index = 0;
+     
+      const self = this.el;
+      self.addEventListener('key_up', function() {
+          console.log("key up!");
+      })
+  }//,
+
+  // tick: function (time) {
+  //   // Swap every second.
+  //   var self = this;
+  //   if (time - this.time < 2000) { return; }
+  //   this.time = time;
+
+  //   // Set template.
+  //   this.maskEl.emit('fade');
+  //   setTimeout(function () {
+  //     self.el.setAttribute('template', 'src', self.data[self.index++]);
+  //     self.maskEl.emit('fade');
+  //     if (self.index === self.data.length) { self.index = 0; }
+  //   }, 200);
+  // }
+});
+
+},{}],4:[function(require,module,exports){
 /**
  * @author Filipe Caixeta / http://filipecaixeta.com.br
  * @author Mugen87 / https://github.com/Mugen87
@@ -454,4 +526,9 @@ PCDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 module.exports = PCDLoader;
 
-},{}]},{},[1]);
+},{}],5:[function(require,module,exports){
+require("./a-components/pcd_model.js");
+require("./a-components/scene_switcher.js");
+require("./a-components/keyboard_event_emitter.js");
+
+},{"./a-components/keyboard_event_emitter.js":1,"./a-components/pcd_model.js":2,"./a-components/scene_switcher.js":3}]},{},[5]);

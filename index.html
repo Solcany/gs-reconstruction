@@ -15,8 +15,9 @@
                 <a-asset-item id="graffiti-pcd" src="./assets/models/graffiti1_55k_verts.pcd" response-type="arraybuffer"></a-asset-item>
                 <a-asset-item id="car-pcd" src="./assets/models/thecar_80k_verts.pcd" response-type="arraybuffer"></a-asset-item>
             </a-assets>
+            <a-entity keyboard-event-emitter></a-entity>
             <a-light type="point" color="blue" position="0 5 0" intensity="50"></a-light>
-            <a-entity camera look-controls mouse-cursor></a-entity>
+            <a-entity camera look-controls mouse-cursor></a-ientity>
             <a-entity pcd-model="pcd: #house-pcd; point_size: 1.0"  scale="13 13 13"></a-entity>
             <a-entity pcd-model="pcd: #graffiti-pcd; point_size: 0.7"  scale="30 30 30" position="68 -60 90" rotation="-9 -173 -1"></a-entity>
             <a-entity pcd-model="pcd: #car-pcd; point_size: 0.7"  scale="40 40 40" position="570 -60 -37" rotation="-1 -373 -1"></a-entity>
