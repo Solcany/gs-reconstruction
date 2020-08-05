@@ -3,6 +3,8 @@ AFRAME.registerComponent('template-switcher', {
         templates: {type: 'array'}
     },
 
+  // emitts: 'template_set'
+
   init: function () {
     this.index = 0;
     this.manage_templates();
@@ -41,29 +43,24 @@ AFRAME.registerComponent('template-switcher', {
     keyboard_emitter.addEventListener('key_left', decrease_index.bind(this), false);
   },
 
-  get_template_audio: function() {
-    // get
-    const template_content = this.el.components.template.el
-    const template_audio = template_content.querySelector[''];
-    return template_content;
-  },
 
   manage_audio: function() {
     // play any audio present in the templates
 
-    this.el.addEventListener('template_set', function() {
-      console.log("template was set!");
-    })
-    
-    const audio = this.get_template_audio();
-    console.log(this.el)
+    const play_audio = function() {
 
-    if(audio != null || undefined) {
-      console.log(audio);
-    } else {
-      console.log("no audio!");
+      // get the html content of the currently loaded aframe template
+      const template_content = this.el.components.template.el
+
+      // get sound files from the template
+      const template_audio = template_content.querySelectorAll('[sound]');
+
+      if(template_audio.length > 0) {
+        template_audio[0].components.sound.playSound();
+      }
     }
 
+    this.el.addEventListener('template_set', play_audio.bind(this), false);
   }
 
 

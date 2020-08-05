@@ -1,2 +1,2 @@
  <a-entity pcd-model="pcd: #car-pcd; point_size: 0.3"  scale="5 5 5"></a-entity>
- <a-entity sound="src: #click-mp3"></a-entity>
+ <a-entity sound="src: #click-mp3" positional="false"></a-entity>
