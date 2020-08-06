@@ -1,24 +1,23 @@
-AFRAME.registerComponent('template-switcher', {
+AFRAME.registerComponent('sound-switcher', {
     schema: {
-        templates: {type: 'array'}
+        sounds: {type: 'array'}
     },
 
-  // emitts: 'template_set'
+  // emitts: 'sound_set'
 
   init: function () {
     this.index = 0;
-    this.manage_templates();
     this.manage_audio();
   },
 
-  set_template: function() {
-    this.el.setAttribute('template', 'src', this.data.templates[this.index]);
-    this.el.emit('template_set', null, false)
+  set_sound: function() {
+    this.el.setAttribute('src', this.data.sounds[this.index]);
+    this.el.emit('sound_set', null, false)
   },
 
-  manage_templates: function() {
+  manage_audio: function() {
     // cycle between templates on key press
-    // 
+    //
     const keyboard_emitter = document.getElementById("keyboard-emitter");
 
     const increase_index = function() {
@@ -50,13 +49,18 @@ AFRAME.registerComponent('template-switcher', {
     const play_audio = function() {
 
       // get the html content of the currently loaded aframe template
-      const template_content = this.el.components.template.el
+      let template_content = this.el.components.template.el
 
       // get sound files from the template
-      const template_audio = template_content.querySelectorAll('[sound]');
+      let template_audio = template_content.getElementsByTagName('a-sound');
+
+      console.log(template_audio[0]);
 
       if(template_audio.length > 0) {
         template_audio[0].components.sound.playSound();
+        setTimeout(function(){
+          template_audio[0].disconnect();
+        },500)
       }
     }
 

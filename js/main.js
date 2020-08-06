@@ -2,6 +2,9 @@
 require("./libs/aframe-template-component.min.js");
 
 // components
-require("./a-components/pcd_model.js");
-require("./a-components/template_switcher.js");
-require("./a-components/keyboard_event_emitter.js");
+require("./a_components/pcd_model.js");
+require("./a_components/template_switcher.js");
+require("./a_components/keyboard_event_emitter.js");
+
+// primitives
+require("./a_primitives/a_data.js")
