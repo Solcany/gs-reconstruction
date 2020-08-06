@@ -1,6 +1,7 @@
 AFRAME.registerComponent('template-switcher', {
-    schema: {
-        templates: {type: 'array'}
+  schema: {
+    hasAudio: {type: 'boolean', default: true},
+    templates: {type: 'array'}
     },
 
   // emitts: 'template_set'
@@ -8,7 +9,11 @@ AFRAME.registerComponent('template-switcher', {
   init: function () {
     this.index = 0;
     this.manage_templates();
-    this.manage_audio();
+
+    if(this.data.hasAudio) {
+      this.manage_audio();
+    }
+
   },
 
   set_template: function() {
@@ -50,6 +55,8 @@ AFRAME.registerComponent('template-switcher', {
     const sound_el = document.getElementById("audio-player");
     if (!sound_el) throw new Error("a-sound element wasn't found in the DOM, add <a-sound id='audio-player' src='' positional='false'></a-sound> to DOM")
 
+    const sound_player = sound_el.components.sound
+    sound_player.stopSound();
 
     const play_audio = function() {
       // get the html content of the currently loaded aframe template
@@ -68,8 +75,6 @@ AFRAME.registerComponent('template-switcher', {
         // WIP: currently plays only the first audio source in the template
         const src = audio[0].getAttribute('data')
         sound_el.setAttribute('sound','src', src);
-        
-        const sound_player = sound_el.components.sound
         sound_player.playSound();
 
       } else {

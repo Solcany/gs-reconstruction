@@ -9,6 +9,7 @@
     </head>
     <body>
         <a-scene debug background="color: #191a1c" vr-mode-ui="enabled: false">
+
             <a-assets>
                 <!-- PCD -->
                 <a-asset-item id="house-pcd" src="./assets/models/main_object(house1).pcd" response-type="arraybuffer"></a-asset-item>
@@ -18,30 +19,26 @@
                 <!-- SOUND -->
                 <audio id="click-mp3" src="./assets/sound/click.mp3" preload="auto"></audio>
                 <audio id="doctor-mp3" src="./assets/sound/doctor.mp3" preload="auto"></audio>
-
             </a-assets>
 
-            <!-- utils -->
+            <!-- interaction -->
             <a-entity id="keyboard-emitter" keyboard-event-emitter></a-entity>
-            <a-entity id="audio-player" sound="src: null; positional: false"></a-entity>
 
-            <!-- scene utils -->
-            <a-light type="point" color="blue" position="0 5 0" intensity="50"></a-light>
+            <!-- sound -->
+            <a-sound id="audio-player" src="null" positional="false"></a-sound>
+
+            <!-- main camera -->
             <a-entity camera look-controls mouse-cursor></a-entity>
 
             <!-- scene objects -->
-            <a-entity template="src: ./assets/scenes/scene1/main-object.template" position="13 13 13">
-            </a-entity>
+            <!-- always set scene objects parameters in the template file -->
+            <a-entity template="src: ./assets/scenes/scene1/main-object.template" position="0 0 0"></a-entity>
 
             <a-entity id="template-switcher"
                       template="src: ./assets/scenes/scene1/objects/man.template"
-                      template-switcher="templates: ./assets/scenes/scene1/objects/man2.template, ./assets/scenes/scene1/objects/man.template"
-                      position="13 0 13">
-            </a-entity>
-
-            <!-- <a-sound id="voiceover-sound"
-                 src="#click-mp3"
-                 sound-switcher="sounds: #click-mp3, "> -->
+                      template-switcher="hasAudio: true;
+                                         templates: ./assets/scenes/scene1/objects/man2.template, ./assets/scenes/scene1/objects/man.template"
+                      position="0 0 0"></a-entity>
 
 
 

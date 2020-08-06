@@ -1,1 +1,1 @@
- <a-entity pcd-model="pcd: #house-pcd; point_size: 1.0"§ scale="13 13 13"></a-entity>
+ <a-entity pcd-model="pcd: #house-pcd; point_size: 0.1" scale="0.5 0.5 0.5"></a-entity>
