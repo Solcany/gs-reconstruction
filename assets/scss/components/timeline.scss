@@ -1,0 +1,8 @@
+#timeline {
+    position: absolute;
+    bottom: 0;
+    height: 30px;
+    background-color: red;
+    z-index: $z-top;
+    width: 100%;
+}

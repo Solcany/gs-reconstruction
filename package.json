@@ -10,10 +10,11 @@
   },
   "devDependencies": {},
   "scripts": {
-	"watchify": "watchify ./js/main.js -o ./js-dist/bundle.js",
-	"browser-sync" : "browser-sync start --server --files 'index.html, ./js-dist/bundle.js, ./assets/scenes'",
-  "dev": "concurrently --kill-others \"npm run browser-sync\" \"npm run watchify\"",
-	"test": "echo \"Error: no test specified\" && exit 1"
+	 "watchify": "watchify ./js/main.js -o ./js-dist/bundle.js",
+   "sass-watch": "sass --watch ./assets/scss/main.scss:./assets/css/bundle.css",
+	 "browser-sync": "browser-sync start --server --files 'index.html, ./assets/css/bundle.css, ./js-dist/bundle.js, ./assets/scenes'",
+   "dev": "concurrently --kill-others \"npm run browser-sync\" \"npm run sass-watch\" \"npm run watchify\"",
+	 "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC"

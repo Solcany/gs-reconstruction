@@ -1,6 +1,9 @@
+const {loadJSON} = require('../js_components/utils.js')
+
 AFRAME.registerComponent('template-switcher', {
   schema: {
-    hasAudio: {type: 'boolean', default: true},
+    hasAudio: {type: 'boolean', default: false},
+    fromJson: {type: 'string'},
     templates: {type: 'array'}
     },
 
@@ -16,8 +19,8 @@ AFRAME.registerComponent('template-switcher', {
 
   },
 
-  set_template: function() {
-    this.el.setAttribute('template', 'src', this.data.templates[this.index]);
+  set_template: function(paths, index) {
+    this.el.setAttribute('template', 'src', paths[index]);
 
     // wait 100 ms before emitting the 'set' event
     setTimeout(
@@ -27,19 +30,36 @@ AFRAME.registerComponent('template-switcher', {
 
   manage_templates: function() {
     // cycle between templates on key press
-    // 
+
     const keyboard_emitter = document.getElementById("keyboard-emitter");
     if (!keyboard_emitter) throw new Error("keyboard emitter wasn't found in the DOM, add <a-entity id='keyboard-emitter' keyboard-event-emitter></a-entity> to DOM")
+
+    var paths = [];
+
+    if(this.data.fromJson) {
+       loadJSON(this.data.fromJson, function(response) {
+         templates = JSON.parse(response);
+         for (let i = 0; i < templates.length; i++) {
+           let template = templates[i]
+           let path = template["template_path"]
+           console.log(path);
+           paths.push(path)
+         }
+       });
+    } else if(this.data.templates){
+      paths = this.data.templates
+    } else {
+      throw new Error("no templates paths provided for this template switcher")
+    }
 
     const increase_index = function() {
       this.index += 1
       if(this.index === this.data.templates.length) this.index = 0;
-      this.set_template();
+      this.set_template(paths, this.index);
     }
-
     const decrease_index = function() {
       if(this.index > 0) this.index -= 1;
-      this.set_template();
+      this.set_template(paths, this.index);
     }
 
     keyboard_emitter.addEventListener('key_right', increase_index.bind(this), false);

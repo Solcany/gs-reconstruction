@@ -6,10 +6,14 @@
         <meta name="description" content="Hello, WebVR! • A-Frame">
         <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
         <script src="./js-dist/bundle.js"></script>
+
+        <link rel="stylesheet" href="./assets/css/bundle.css">
+       
+        <!-- data -->
+
     </head>
     <body>
         <a-scene debug background="color: #191a1c" vr-mode-ui="enabled: false">
-
             <a-assets>
                 <!-- PCD -->
                 <a-asset-item id="house-pcd" src="./assets/models/main_object(house1).pcd" response-type="arraybuffer"></a-asset-item>
@@ -27,27 +31,24 @@
             <!-- sound -->
             <a-sound id="audio-player" src="null" positional="false"></a-sound>
 
-            <!-- main camera -->
-            <a-entity camera look-controls mouse-cursor></a-entity>
-
             <!-- scene objects -->
             <!-- always set scene objects parameters in the template file -->
-            <a-entity template="src: ./assets/scenes/scene1/main-object.template" position="0 0 0"></a-entity>
+            <a-entity id="main" template="src: ./assets/scenes/scene1/main-object.template" position="0 0 0"></a-entity>
 
             <a-entity id="template-switcher"
                       template="src: ./assets/scenes/scene1/objects/man.template"
-                      template-switcher="hasAudio: true;
-                                         templates: ./assets/scenes/scene1/objects/man2.template, ./assets/scenes/scene1/objects/man.template"
+                      template-switcher="
+                          hasAudio: true;
+                          fromJson: ./assets/data/timeline.json;
+                          templates: ./assets/scenes/scene1/objects/man2.template, ./assets/scenes/scene1/objects/man.template"
                       position="0 0 0"></a-entity>
 
+            <!-- main camera -->i
+            <a-entity id="rig" geometry="primitive: box" look-at="#floor" position="-9 9 15">
+                <a-entity id="overview-camera" camera rotation="0 180 0"></a-entity>
+            </a-entity>
 
-
-            <!-- <a-entity pcd-model="pcd: #house-pcd; point_size: 1.0"  scale="13 13 13"></a-entity> -->
-            <!-- <a-entity pcd-model="pcd: #graffiti-pcd; point_size: 0.7"  scale="30 30 30" position="68 -60 90" rotation="-9 -173 -1"></a-entity>
-                 <a-entity pcd-model="pcd: #car-pcd; point_size: 0.7"  scale="40 40 40" position="570 -60 -37" rotation="-1 -373 -1"></a-entity> -->
-
-            <a-plane position="0 0 0" rotation="-90 0 0" width="4" height="4" color="#7BC8A4" shadow></a-plane>
-            <!-- <a-sky color="#ECECEC"></a-sky> -->
+            <a-plane id="floor" position="0 0 0" rotation="-90 0 0" width="4" height="4" color="#7BC8A4" shadow></a-plane>
         </a-scene>
 
     </body>
