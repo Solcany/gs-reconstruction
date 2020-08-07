@@ -225,19 +225,29 @@ AFRAME.registerPrimitive('a-data', {
 });
 
 },{}],5:[function(require,module,exports){
+const {loadJSON} = require('../js_components/utils.js')
+
 (function() {
+
+    const timeline_data = function() {
+        loadJSON('../../assets/data/timeline.js', function(response) {
+           return JSON.parse(response);
+        })
+    };
+
     document.addEventListener("DOMContentLoaded", function() {
         const init = function() {
             const timeline = document.createElement('DIV');
-            const body = document.getElementsByTagName("BODY")[0];
             timeline.id = "timeline"
+            const body = document.getElementsByTagName("BODY")[0];
             body.appendChild(timeline);
+            console.log(timeline_data);
         }
         init();
-    });
+    })
 })()
 
-},{}],6:[function(require,module,exports){
+},{"../js_components/utils.js":6}],6:[function(require,module,exports){
 const loadJSON = function (path, callback) {
 
     var xobj = new XMLHttpRequest();
