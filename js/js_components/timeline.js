@@ -1,9 +1,10 @@
 const {loadJSON} = require('../js_components/utils.js')
 
-(function() {
+const timeline_json_path = '../../assets/data/timeline.js'
 
+const create_timeline = function() {
     const timeline_data = function() {
-        loadJSON('../../assets/data/timeline.js', function(response) {
+        loadJSON(timeline_json_path, function(response) {
            return JSON.parse(response);
         })
     };
@@ -18,4 +19,6 @@ const {loadJSON} = require('../js_components/utils.js')
         }
         init();
     })
-})()
+}
+
+exports.create_timeline = create_timeline

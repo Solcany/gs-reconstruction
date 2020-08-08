@@ -1,4 +1,4 @@
-const loadJSON = function (path, callback) {
+const loadJSON = function(path, callback) {
 
     var xobj = new XMLHttpRequest();
         xobj.overrideMimeType("application/json");
@@ -12,6 +12,4 @@ const loadJSON = function (path, callback) {
     xobj.send(null); 
  }
 
-module.exports = {
-  loadJSON: loadJSON
-}
+exports.loadJSON = loadJSON
