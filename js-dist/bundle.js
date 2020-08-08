@@ -108,7 +108,6 @@ const register_template_switcher = function() {
     },
 
     // emitts: 'template_set'
-
     init: function () {
       this.index = 0;
       this.manage_templates();
@@ -116,12 +115,10 @@ const register_template_switcher = function() {
       if(this.data.hasAudio) {
         this.manage_audio();
       }
-
     },
 
-    set_template: function(paths, index) {
-      this.el.setAttribute('template', 'src', paths[index]);
-
+    set_template: function(path) {
+      this.el.setAttribute('template', 'src', path);
       // wait 100 ms before emitting the 'set' event
       setTimeout(
         function() { this.el.emit('template_set', null, false) }.bind(this)
@@ -142,7 +139,6 @@ const register_template_switcher = function() {
           for (let i = 0; i < templates.length; i++) {
             let template = templates[i]
             let path = template["template_path"]
-            console.log(path);
             paths.push(path)
           }
         });
@@ -155,17 +151,44 @@ const register_template_switcher = function() {
       const increase_index = function() {
         this.index += 1
         if(this.index === this.data.templates.length) this.index = 0;
-        this.set_template(paths, this.index);
+        let path = paths[this.index]
+        this.set_template(path);
       }
       const decrease_index = function() {
         if(this.index > 0) this.index -= 1;
-        this.set_template(paths, this.index);
+        let path = paths[this.index]
+        this.set_template(path);
       }
 
       keyboard_emitter.addEventListener('key_right', increase_index.bind(this), false);
       keyboard_emitter.addEventListener('key_left', decrease_index.bind(this), false);
     },
 
+    manage_templates_: function() {
+      // cycle between templates on key press
+      var paths = [];
+
+      let templates;
+
+      if(this.data.fromJson) {
+        loadJSON(this.data.fromJson, function(response) {
+          templates = JSON.parse(response);
+          for (let i = 0; i < templates.length; i++) {
+            let template = templates[i]
+            let path = template["template_path"]
+            paths.push(path)
+          }
+        });
+      } else {
+        throw new Error("no templates paths provided for this template switcher")
+      }
+
+
+
+
+      keyboard_emitter.addEventListener('key_right', increase_index.bind(this), false);
+      keyboard_emitter.addEventListener('key_left', decrease_index.bind(this), false);
+        },
 
     manage_audio: function() {
       // play any audio present in the templates.
@@ -246,52 +269,83 @@ const {loadJSON} = require('../js_components/utils.js')
 
 const timeline_json_path = '../../assets/data/timeline.json'
 
-const create_timeline = function() {
-    var timeline_data;
-    loadJSON(timeline_json_path, function(response) {
-        timeline_data = JSON.parse(response);
-    });
+const timeline = function() {
+    const get_json_data = function() {
+        var json_data;
+        loadJSON(timeline_json_path, function(response) {
+            json_data = JSON.parse(response);
+        });
+        const names = json_data.map(datum => datum["name"])
+        return json_data
+    }
+
+    const timeline_data = get_json_data()
     const timeline_names = timeline_data.map(datum => datum["name"])
 
-
     document.addEventListener("DOMContentLoaded", function() {
-        const create_radio_el = function(name) {
-            let input = document.createElement('input')
-            	input.type = 'radio'
-            	input.name = 'timeline'
-            	input.id = name
-
-            let label = document.createElement('label')
-            	label.htmlFor = name
-            	label.textContent = name
-
-            let li = document.createElement('li')
-            	li.appendChild(input);
-            	li.appendChild(label);
-
-            return li;
-        }
-
-        const init = function() {
+        const create_timeline = function() {
             const timeline = document.createElement('DIV');
                   timeline.id = "timeline"
             const timeline_ul = document.createElement('UL')
-
             const body = document.getElementsByTagName("BODY")[0];
+
+            const create_radio_el = function(name, isChecked) {
+                let input = document.createElement('input')
+            	input.type = 'radio'
+            	input.name = 'timeline'
+            	input.id = name
+                if(isChecked) input.checked = true
+
+                let label = document.createElement('label')
+            	label.htmlFor = name
+            	label.textContent = name
+
+                let li = document.createElement('li')
+            	li.appendChild(input);
+            	li.appendChild(label);
+
+                return li;
+            }
 
             for(let i = 0; i < timeline_names.length; i++) {
                 let name = timeline_names[i]
-                let li = create_radio_el(name);
+                // make the first radio button checked
+                let isChecked = false;
+                if(i === 0) isChecked = true
+                let li = create_radio_el(name, isChecked);
                 timeline_ul.appendChild(li);
             }
+
             timeline.appendChild(timeline_ul);
             body.appendChild(timeline);
         }
-        init();
+
+        const update_timeline = function() {
+          //wip
+        }
+
+        const timeline_emitter = function() {
+            const timeline = document.getElementById('timeline')
+            const timeline_ul = timeline.querySelector('UL')
+            const inputs = timeline_ul.querySelectorAll('input')
+
+            for(let i = 0; i < inputs.length; i++) {
+                let input = inputs[i]
+                input.addEventListener('change', function() {
+                    let timeline_event_data = timeline_data[i]
+                    const event = new CustomEvent('timeline_change', {
+                        detail: { timeline_event_data }
+                    });
+                    timeline.dispatchEvent(event)
+                })
+            }
+        }
+        create_timeline();
+        timeline_emitter();
     })
 }
 
-exports.create_timeline = create_timeline
+exports.timeline = timeline
 
 },{"../js_components/utils.js":6}],6:[function(require,module,exports){
 const loadJSON = function(path, callback) {
@@ -729,7 +783,7 @@ const {register_keyframe_event_emitter} = require("./a_components/keyboard_event
 //aframe  primitives
 const {register_a_data} = require("./a_primitives/a_data.js")
 // js components
-const {create_timeline} = require("./js_components/timeline.js");
+const {timeline} = require("./js_components/timeline.js");
 
 (function () {
     //aframe components
@@ -737,8 +791,9 @@ const {create_timeline} = require("./js_components/timeline.js");
     register_template_switcher();
     register_keyframe_event_emitter();
     register_a_data();
+
     //DOM
-    create_timeline();
+    timeline();
 })()
 
 },{"./a_components/keyboard_event_emitter.js":1,"./a_components/pcd_model.js":2,"./a_components/template_switcher.js":3,"./a_primitives/a_data.js":4,"./js_components/timeline.js":5}]},{},[8]);

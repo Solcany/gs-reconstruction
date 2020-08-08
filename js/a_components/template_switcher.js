@@ -9,7 +9,6 @@ const register_template_switcher = function() {
     },
 
     // emitts: 'template_set'
-
     init: function () {
       this.index = 0;
       this.manage_templates();
@@ -17,12 +16,10 @@ const register_template_switcher = function() {
       if(this.data.hasAudio) {
         this.manage_audio();
       }
-
     },
 
-    set_template: function(paths, index) {
-      this.el.setAttribute('template', 'src', paths[index]);
-
+    set_template: function(path) {
+      this.el.setAttribute('template', 'src', path);
       // wait 100 ms before emitting the 'set' event
       setTimeout(
         function() { this.el.emit('template_set', null, false) }.bind(this)
@@ -43,7 +40,6 @@ const register_template_switcher = function() {
           for (let i = 0; i < templates.length; i++) {
             let template = templates[i]
             let path = template["template_path"]
-            console.log(path);
             paths.push(path)
           }
         });
@@ -56,17 +52,44 @@ const register_template_switcher = function() {
       const increase_index = function() {
         this.index += 1
         if(this.index === this.data.templates.length) this.index = 0;
-        this.set_template(paths, this.index);
+        let path = paths[this.index]
+        this.set_template(path);
       }
       const decrease_index = function() {
         if(this.index > 0) this.index -= 1;
-        this.set_template(paths, this.index);
+        let path = paths[this.index]
+        this.set_template(path);
       }
 
       keyboard_emitter.addEventListener('key_right', increase_index.bind(this), false);
       keyboard_emitter.addEventListener('key_left', decrease_index.bind(this), false);
     },
 
+    manage_templates_: function() {
+      // cycle between templates on key press
+      var paths = [];
+
+      let templates;
+
+      if(this.data.fromJson) {
+        loadJSON(this.data.fromJson, function(response) {
+          templates = JSON.parse(response);
+          for (let i = 0; i < templates.length; i++) {
+            let template = templates[i]
+            let path = template["template_path"]
+            paths.push(path)
+          }
+        });
+      } else {
+        throw new Error("no templates paths provided for this template switcher")
+      }
+
+
+
+
+      keyboard_emitter.addEventListener('key_right', increase_index.bind(this), false);
+      keyboard_emitter.addEventListener('key_left', decrease_index.bind(this), false);
+        },
 
     manage_audio: function() {
       // play any audio present in the templates.

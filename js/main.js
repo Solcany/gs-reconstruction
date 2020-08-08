@@ -5,7 +5,7 @@ const {register_keyframe_event_emitter} = require("./a_components/keyboard_event
 //aframe  primitives
 const {register_a_data} = require("./a_primitives/a_data.js")
 // js components
-const {create_timeline} = require("./js_components/timeline.js");
+const {timeline} = require("./js_components/timeline.js");
 
 (function () {
     //aframe components
@@ -13,6 +13,7 @@ const {create_timeline} = require("./js_components/timeline.js");
     register_template_switcher();
     register_keyframe_event_emitter();
     register_a_data();
+
     //DOM
-    create_timeline();
+    timeline();
 })()
