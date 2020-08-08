@@ -1,8 +1,14 @@
 #timeline {
     position: absolute;
     bottom: 0;
-    height: 30px;
+    height: 100px;
     background-color: red;
     z-index: $z-top;
     width: 100%;
+
+    ul {
+        li {
+            display: inline-block;
+        }
+    }
 }

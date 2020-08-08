@@ -6,10 +6,13 @@ a-scene {
 #timeline {
   position: absolute;
   bottom: 0;
-  height: 30px;
+  height: 100px;
   background-color: red;
   z-index: 10000;
   width: 100%;
+}
+#timeline ul li {
+  display: inline-block;
 }
 
 /*# sourceMappingURL=bundle.css.map */
