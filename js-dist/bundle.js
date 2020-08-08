@@ -102,17 +102,16 @@ const {loadJSON} = require('../js_components/utils.js')
 const register_template_switcher = function() {
   AFRAME.registerComponent('template-switcher', {
     schema: {
-      hasAudio: {type: 'boolean', default: false},
-      fromJson: {type: 'string'},
-      templates: {type: 'array'}
+      parseAudio: {type: 'boolean', default: false},
+      fromJson: {type: 'string'}
     },
 
     // emitts: 'template_set'
     init: function () {
       this.index = 0;
-      this.manage_templates();
+      this.manage_templates_();
 
-      if(this.data.hasAudio) {
+      if(this.data.parseAudio) {
         this.manage_audio();
       }
     },
@@ -141,9 +140,7 @@ const register_template_switcher = function() {
             let path = template["template_path"]
             paths.push(path)
           }
-        });
-      } else if(this.data.templates){
-        paths = this.data.templates
+        })
       } else {
         throw new Error("no templates paths provided for this template switcher")
       }
@@ -159,35 +156,40 @@ const register_template_switcher = function() {
         let path = paths[this.index]
         this.set_template(path);
       }
-
       keyboard_emitter.addEventListener('key_right', increase_index.bind(this), false);
       keyboard_emitter.addEventListener('key_left', decrease_index.bind(this), false);
     },
 
     manage_templates_: function() {
       // cycle between templates on key press
-      var paths = [];
 
-      let templates;
+      // from timeline
+      const timeline = document.getElementById("timeline");
+      if(!timeline) throw new Error("div#timeline is missing from DOM, create one manually at the top of the document")
 
-      if(this.data.fromJson) {
-        loadJSON(this.data.fromJson, function(response) {
-          templates = JSON.parse(response);
-          for (let i = 0; i < templates.length; i++) {
-            let template = templates[i]
-            let path = template["template_path"]
-            paths.push(path)
-          }
-        });
-      } else {
-        throw new Error("no templates paths provided for this template switcher")
+      const process_event = function(self, event) {
+        let data = event.detail.data
+        let path = data["template_path"]
+        this.set_template(path);
       }
 
+      timeline.addEventListener("timeline_change",
+                                process_event.bind(this, event))
+      // let templates;
 
+      // if(this.data.fromJson) {
+      //   loadJSON(this.data.fromJson, function(response) {
+      //     templates = JSON.parse(response);
+      //     for (let i = 0; i < templates.length; i++) {
+      //       let template = templates[i]
+      //       let path = template["template_path"]
+      //       paths.push(path)
+      //     }
+      //   });
+      // } else {
+      //   throw new Error("no templates paths provided for this template switcher")
+      // }
 
-
-      keyboard_emitter.addEventListener('key_right', increase_index.bind(this), false);
-      keyboard_emitter.addEventListener('key_left', decrease_index.bind(this), false);
         },
 
     manage_audio: function() {
@@ -289,11 +291,12 @@ const timeline = function() {
             const timeline_ul = document.createElement('UL')
             const body = document.getElementsByTagName("BODY")[0];
 
-            const create_radio_el = function(name, isChecked) {
+            const create_radio_el = function(index, name, isChecked) {
                 let input = document.createElement('input')
             	input.type = 'radio'
             	input.name = 'timeline'
             	input.id = name
+                input.index = index
                 if(isChecked) input.checked = true
 
                 let label = document.createElement('label')
@@ -312,7 +315,7 @@ const timeline = function() {
                 // make the first radio button checked
                 let isChecked = false;
                 if(i === 0) isChecked = true
-                let li = create_radio_el(name, isChecked);
+                let li = create_radio_el(i, name, isChecked);
                 timeline_ul.appendChild(li);
             }
 
@@ -324,7 +327,72 @@ const timeline = function() {
           //wip
         }
 
-        const timeline_emitter = function() {
+        const dispatch_timeline_event = function(timeline_el, index) {
+            let data = timeline_data[index]
+            const event = new CustomEvent('timeline_change', {
+                detail: { data }
+            });
+            timeline_el.dispatchEvent(event)
+        }
+
+
+        const timeline_onkey_emitter = function() {
+            const timeline = document.getElementById('timeline')
+            const timeline_ul = timeline.querySelector('UL')
+            const inputs = timeline_ul.getElementsByTagName('input')
+
+            const keyboard_emitter = document.getElementById("keyboard-emitter");
+            if (!keyboard_emitter) throw new Error("keyboard emitter wasn't found in the DOM, add <a-entity id='keyboard-emitter' keyboard-event-emitter></a-entity> to DOM")
+
+            // next timeline element on click
+            keyboard_emitter.addEventListener("key_right", function(event) {
+                const inputs_arr = Array.from(inputs)
+                const active_el = inputs_arr.filter(input => input.checked == true)[0]
+                const active_index = active_el.index
+
+                const next_index = active_index + 1;
+
+                if(next_index < inputs.length) {
+                    // uncheck current radio
+                    active_el.checked = false
+                    //check the next radio
+                    const next_el = inputs.item(next_index)
+                    	  next_el.checked = true
+
+                    dispatch_timeline_event(timeline, next_index);
+                } else {
+                    console.warn("the end of the timeline was reached")
+                    return;
+                }
+            })
+
+            // previous timeline element on click
+            keyboard_emitter.addEventListener("key_left", function(event) {
+                const inputs_arr = Array.from(inputs)
+                const active_el = inputs_arr.filter(input => input.checked == true)[0]
+                const active_index = active_el.index
+
+                const previous_index = active_index - 1;
+
+                if(previous_index > -1) {
+                    // uncheck current radio
+                    active_el.checked = false
+                    //check the next radio
+                    const previous_el = inputs.item(previous_index)
+                    	  previous_el.checked = true
+
+                    dispatch_timeline_event(timeline, previous_index);
+                } else {
+                    console.warn("the start of the timeline was reached")
+                    return;
+                }
+            })
+
+
+
+        }
+
+        const timeline_onclick_emitter = function() {
             const timeline = document.getElementById('timeline')
             const timeline_ul = timeline.querySelector('UL')
             const inputs = timeline_ul.querySelectorAll('input')
@@ -332,16 +400,13 @@ const timeline = function() {
             for(let i = 0; i < inputs.length; i++) {
                 let input = inputs[i]
                 input.addEventListener('change', function() {
-                    let timeline_event_data = timeline_data[i]
-                    const event = new CustomEvent('timeline_change', {
-                        detail: { timeline_event_data }
-                    });
-                    timeline.dispatchEvent(event)
+                    dispatch_timeline_event(timeline, i)
                 })
             }
         }
         create_timeline();
-        timeline_emitter();
+        timeline_onkey_emitter();
+        timeline_onclick_emitter();
     })
 }
 

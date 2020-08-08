@@ -3,17 +3,16 @@ const {loadJSON} = require('../js_components/utils.js')
 const register_template_switcher = function() {
   AFRAME.registerComponent('template-switcher', {
     schema: {
-      hasAudio: {type: 'boolean', default: false},
-      fromJson: {type: 'string'},
-      templates: {type: 'array'}
+      parseAudio: {type: 'boolean', default: false},
+      fromJson: {type: 'string'}
     },
 
     // emitts: 'template_set'
     init: function () {
       this.index = 0;
-      this.manage_templates();
+      this.manage_templates_();
 
-      if(this.data.hasAudio) {
+      if(this.data.parseAudio) {
         this.manage_audio();
       }
     },
@@ -42,9 +41,7 @@ const register_template_switcher = function() {
             let path = template["template_path"]
             paths.push(path)
           }
-        });
-      } else if(this.data.templates){
-        paths = this.data.templates
+        })
       } else {
         throw new Error("no templates paths provided for this template switcher")
       }
@@ -60,35 +57,40 @@ const register_template_switcher = function() {
         let path = paths[this.index]
         this.set_template(path);
       }
-
       keyboard_emitter.addEventListener('key_right', increase_index.bind(this), false);
       keyboard_emitter.addEventListener('key_left', decrease_index.bind(this), false);
     },
 
     manage_templates_: function() {
       // cycle between templates on key press
-      var paths = [];
 
-      let templates;
+      // from timeline
+      const timeline = document.getElementById("timeline");
+      if(!timeline) throw new Error("div#timeline is missing from DOM, create one manually at the top of the document")
 
-      if(this.data.fromJson) {
-        loadJSON(this.data.fromJson, function(response) {
-          templates = JSON.parse(response);
-          for (let i = 0; i < templates.length; i++) {
-            let template = templates[i]
-            let path = template["template_path"]
-            paths.push(path)
-          }
-        });
-      } else {
-        throw new Error("no templates paths provided for this template switcher")
+      const process_event = function(self, event) {
+        let data = event.detail.data
+        let path = data["template_path"]
+        this.set_template(path);
       }
 
+      timeline.addEventListener("timeline_change",
+                                process_event.bind(this, event))
+      // let templates;
 
+      // if(this.data.fromJson) {
+      //   loadJSON(this.data.fromJson, function(response) {
+      //     templates = JSON.parse(response);
+      //     for (let i = 0; i < templates.length; i++) {
+      //       let template = templates[i]
+      //       let path = template["template_path"]
+      //       paths.push(path)
+      //     }
+      //   });
+      // } else {
+      //   throw new Error("no templates paths provided for this template switcher")
+      // }
 
-
-      keyboard_emitter.addEventListener('key_right', increase_index.bind(this), false);
-      keyboard_emitter.addEventListener('key_left', decrease_index.bind(this), false);
         },
 
     manage_audio: function() {
