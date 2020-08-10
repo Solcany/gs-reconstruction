@@ -97,6 +97,7 @@ const timeline = function() {
                 }
             })
 
+
             // previous timeline element on click
             keyboard_emitter.addEventListener("key_left", function(event) {
                 const inputs_arr = Array.from(inputs)

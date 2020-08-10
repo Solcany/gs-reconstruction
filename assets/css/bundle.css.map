@@ -1,1 +1,1 @@
-{"version":3,"sourceRoot":"","sources":["../scss/components/aframe-canvas.scss","../scss/vars.scss","../scss/components/timeline.scss"],"names":[],"mappings":"AAAA;EACI;EACA,SCGO;;;ACLX;EACI;EACA;EACA;EACA;EACA,SDDI;ECEJ;;AAGI;EACI","file":"bundle.css"}
+{"version":3,"sourceRoot":"","sources":["../scss/components/aframe-canvas.scss","../scss/vars.scss","../scss/components/timeline.scss"],"names":[],"mappings":"AAAA;EACI;EACA,SCGO;;;ACLX;EACI;EACA;EACA;EACA;EACA;;AAGI;EACI","file":"bundle.css"}

@@ -1,4 +1,36 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+const {cleanDOMId} = require('../js_components/utils.js')
+
+const register_animation_timeline_controller = function() {
+  AFRAME.registerComponent('animation-timeline-controller', {
+    schema: {
+      timelineId: {type: 'string'},
+      triggerEmitterId: {type: 'string'},
+      triggerNext: {type: 'string'},
+      triggerPrev: {type: 'string'}
+    },
+
+    init: function () {
+      const tl_id = cleanDOMId(this.data.timelineID);
+      const trigger_id = cleanDOMId(this.data.triggerEmitterId)
+
+      this.timeline = document.getElementById(id)
+      this.trigger_emitter = document.getElementById(trigger_id);
+      if(!this.timeline) throw new Error("Animation timeline: " + id + " wasn't found in the DOM, check the ID or add the animation timeline")
+      if(!this.trigger_emitter) throw new Error("Trigger emitter: " + trigger_id + " wasn't found in the DOM, check the ID or add the trigger emitter")
+
+      //this.timeline.pauseAnimation();
+
+        this.timeline.addEventListener("animationcomplete", function() {
+            console.log("some animation has ended somewhere")
+        })
+    }
+  })
+}
+
+exports.register_animation_timeline_controller = register_animation_timeline_controller
+
+},{"../js_components/utils.js":7}],2:[function(require,module,exports){
 
 const register_keyframe_event_emitter = function() {
     AFRAME.registerComponent('keyboard-event-emitter', {
@@ -46,7 +78,7 @@ const register_keyframe_event_emitter = function() {
 
 exports.register_keyframe_event_emitter = register_keyframe_event_emitter
 
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 const PCDLoader = require("../libs/PCDLoader.js");
 
 const register_pcd_model = function() {
@@ -96,7 +128,7 @@ const register_pcd_model = function() {
 
 exports.register_pcd_model = register_pcd_model
 
-},{"../libs/PCDLoader.js":7}],3:[function(require,module,exports){
+},{"../libs/PCDLoader.js":8}],4:[function(require,module,exports){
 const {loadJSON} = require('../js_components/utils.js')
 
 const register_template_switcher = function() {
@@ -249,7 +281,7 @@ const register_template_switcher = function() {
 }
 exports.register_template_switcher = register_template_switcher
 
-},{"../js_components/utils.js":6}],4:[function(require,module,exports){
+},{"../js_components/utils.js":7}],5:[function(require,module,exports){
 const register_a_data = function() {
   AFRAME.registerPrimitive('a-data', {
     // Defaults the ocean to be parallel to the ground.
@@ -266,7 +298,7 @@ const register_a_data = function() {
 
 exports.register_a_data = register_a_data
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 const {loadJSON} = require('../js_components/utils.js')
 
 const timeline_json_path = '../../assets/data/timeline.json'
@@ -366,6 +398,7 @@ const timeline = function() {
                 }
             })
 
+
             // previous timeline element on click
             keyboard_emitter.addEventListener("key_left", function(event) {
                 const inputs_arr = Array.from(inputs)
@@ -412,7 +445,7 @@ const timeline = function() {
 
 exports.timeline = timeline
 
-},{"../js_components/utils.js":6}],6:[function(require,module,exports){
+},{"../js_components/utils.js":7}],7:[function(require,module,exports){
 const loadJSON = function(path, callback) {
 
     var xobj = new XMLHttpRequest();
@@ -429,7 +462,7 @@ const loadJSON = function(path, callback) {
 
 exports.loadJSON = loadJSON
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 /**
  * @author Filipe Caixeta / http://filipecaixeta.com.br
  * @author Mugen87 / https://github.com/Mugen87
@@ -840,11 +873,14 @@ PCDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 module.exports = PCDLoader;
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 // aframe components
 const {register_pcd_model} = require("./a_components/pcd_model.js");
 const {register_template_switcher} = require("./a_components/template_switcher.js");
 const {register_keyframe_event_emitter} = require("./a_components/keyboard_event_emitter.js");
+const {register_animation_timeline_controller} = require("./a_components/animation_timeline_controller.js");
+
+
 //aframe  primitives
 const {register_a_data} = require("./a_primitives/a_data.js")
 // js components
@@ -855,10 +891,13 @@ const {timeline} = require("./js_components/timeline.js");
     register_pcd_model();
     register_template_switcher();
     register_keyframe_event_emitter();
+    register_animation_timeline_controller();
+
+    //aframe primitives
     register_a_data();
 
     //DOM
     timeline();
 })()
 
-},{"./a_components/keyboard_event_emitter.js":1,"./a_components/pcd_model.js":2,"./a_components/template_switcher.js":3,"./a_primitives/a_data.js":4,"./js_components/timeline.js":5}]},{},[8]);
+},{"./a_components/animation_timeline_controller.js":1,"./a_components/keyboard_event_emitter.js":2,"./a_components/pcd_model.js":3,"./a_components/template_switcher.js":4,"./a_primitives/a_data.js":5,"./js_components/timeline.js":6}]},{},[9]);

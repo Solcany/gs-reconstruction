@@ -2,5 +2,7 @@
   {"name":"scene1",
    "template_path": "./assets/scenes/scene1/objects/man.template"},
   {"name":"scene2",
-   "template_path": "./assets/scenes/scene1/objects/man2.template"}
+   "template_path": "./assets/scenes/scene1/objects/man2.template"},
+  {"name":"scene3",
+   "template_path": "./assets/scenes/scene1/objects/man3.template"}
 ]
