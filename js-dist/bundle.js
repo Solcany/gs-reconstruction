@@ -1,29 +1,42 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 const {cleanDOMId} = require('../js_components/utils.js')
 
+// timeline controller component needs to be applied to the same DOM el as animation-timeline component
+
 const register_animation_timeline_controller = function() {
   AFRAME.registerComponent('animation-timeline-controller', {
     schema: {
-      timelineId: {type: 'string'},
       triggerEmitterId: {type: 'string'},
       triggerNext: {type: 'string'},
       triggerPrev: {type: 'string'}
     },
 
     init: function () {
-      const tl_id = cleanDOMId(this.data.timelineID);
-      const trigger_id = cleanDOMId(this.data.triggerEmitterId)
-
-      this.timeline = document.getElementById(id)
+      const trigger_id = cleanDOMId(this.data.triggerEmitterId);
       this.trigger_emitter = document.getElementById(trigger_id);
-      if(!this.timeline) throw new Error("Animation timeline: " + id + " wasn't found in the DOM, check the ID or add the animation timeline")
       if(!this.trigger_emitter) throw new Error("Trigger emitter: " + trigger_id + " wasn't found in the DOM, check the ID or add the trigger emitter")
+      if(!this.el.components['animation-timeline']) throw new Error ("This element needs animation-timeline component for animation-timeline-controller to work properly, add it in the DOM")
 
-      //this.timeline.pauseAnimation();
+      const init_animation = function() {
+        this.el.emit('timeline-start');
+        this.el.components['animation-timeline'].animationIsPlaying = false;
+      }
+      const resume = function() {
+        this.el.components['animation-timeline'].animationIsPlaying = true;
+      }
+      const pause = function() {
+        // !!! bad workaround for animation-timeline buggy pauseEvents feature
+        this.el.components['animation-timeline'].animationIsPlaying = false
+        // should be using this (if it worked ^^):
+        // this.el.emit('timeline-pause');
+      }
 
-        this.timeline.addEventListener("animationcomplete", function() {
-            console.log("some animation has ended somewhere")
-        })
+      // !!! workaround: must wait for DOM to load, doesn't iwork with eventListener, no clue why
+      setTimeout(init_animation.bind(this), 3);
+
+      this.trigger_emitter.addEventListener("key_up", resume.bind(this), false);
+      this.el.addEventListener("animationcomplete", pause.bind(this), false);
+
     }
   })
 }
@@ -458,9 +471,18 @@ const loadJSON = function(path, callback) {
           }
     };
     xobj.send(null); 
- }
+}
+
+const cleanDOMId = function(id) {
+      if (id.includes('#')) {
+          return id.replace('#', '');
+      } else {
+          return id;
+       }
+}
 
 exports.loadJSON = loadJSON
+exports.cleanDOMId = cleanDOMId
 
 },{}],8:[function(require,module,exports){
 /**

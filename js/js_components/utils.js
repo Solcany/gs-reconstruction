@@ -10,6 +10,15 @@ const loadJSON = function(path, callback) {
           }
     };
     xobj.send(null); 
- }
+}
+
+const cleanDOMId = function(id) {
+      if (id.includes('#')) {
+          return id.replace('#', '');
+      } else {
+          return id;
+       }
+}
 
 exports.loadJSON = loadJSON
+exports.cleanDOMId = cleanDOMId

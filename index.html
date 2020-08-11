@@ -28,7 +28,6 @@
                 <audio id="doctor-mp3" src="./assets/sound/doctor.mp3" preload="auto"></audio>
             </a-assets>
 
-
             <a-timeline id="abox_timeline_data">
                 <a-timeline-animation select="#abox" name="position1"></a-timeline-animation>
                 <a-timeline-animation select="#abox" name="position2"></a-timeline-animation>
@@ -38,11 +37,11 @@
             <a-entity id="abox"
                       geometry="primitive: box; width: 5; height: 5; depth: 5"
                       position="0 0 0"
-                      animation-timeline="timeline: #abox_timeline_data; startEvents: key_up"
-                      animation-timeline-controller="timelineId: #abox; triggerEmitterId: #keyboard-emitter; triggerNext: key_up; triggerPrev: key_down;"
-                      animation__position1="property: position; to: 0 5 0; dur: 1000; autoplay: false"
-                      animation__position2="property: position; from: 0 5 0; to: 0 10 0; dur: 1000; autoplay: false"
-                      animation__position3="property: position; from: 0 10 0; to: 0 15 0; dur: 1000; autoplay: false">
+                      animation-timeline="timeline: #abox_timeline_data; startEvents: timeline-start; pauseEvents: timeline-pause"
+                      animation-timeline-controller="triggerEmitterId: #keyboard-emitter; triggerNext: key_up; triggerPrev: key_down"
+                      animation__position1="property: position; to: 0 5 0; dur: 1000; autoplay: false; easing: linear"
+                      animation__position2="property: position; from: 0 5 0; to: 0 10 0; dur: 1000; autoplay: false; easing: linear"
+                      animation__position3="property: position; from: 0 10 0; to: 0 15 0; dur: 1000; autoplay: false; easing: linear">
             </a-entity>
 
 
@@ -68,7 +67,8 @@
                 <a-entity id="overview-camera" camera="zoom: 2;" rotation="0 180 0"></a-entity>
             </a-entity>
 
-            <a-plane id="floor" position="0 0 0" rotation="-90 0 0" width="4" height="4" color="#7BC8A4" shadow></a-plane>
+           <a-plane id="floor" position="0 0 0" rotation="-90 0 0" width="4" height="4" color="#000000"></a-plane> -->
+
         </a-scene>
 
     </body>
