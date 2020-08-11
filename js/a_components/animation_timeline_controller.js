@@ -1,7 +1,6 @@
 const {cleanDOMId} = require('../js_components/utils.js')
 
 // timeline controller component needs to be applied to the same DOM el as animation-timeline component
-
 const register_animation_timeline_controller = function() {
   AFRAME.registerComponent('animation-timeline-controller', {
     schema: {
@@ -23,6 +22,16 @@ const register_animation_timeline_controller = function() {
       const resume = function() {
         this.el.components['animation-timeline'].animationIsPlaying = true;
       }
+      const resume_reverse = function() {
+        console.log(this.el.components['animation-timeline'].timeline.direction)
+        this.el.components['animation-timeline'].timeline.direction = "reverse"
+
+        //this.el.components.['animation-timeline'].direction = "reverse";
+
+        //console.log(this.el.components.['animation-timeline'].direction)
+       this.el.components['animation-timeline'].animationIsPlaying = true;
+      }
+
       const pause = function() {
         // !!! bad workaround for animation-timeline buggy pauseEvents feature
         this.el.components['animation-timeline'].animationIsPlaying = false
@@ -30,10 +39,12 @@ const register_animation_timeline_controller = function() {
         // this.el.emit('timeline-pause');
       }
 
-      // !!! workaround: must wait for DOM to load, doesn't iwork with eventListener, no clue why
+      // !!! workaround: must wait for DOM to load,
+      // doesn't work with eventListener(DOMContentLoaded), no clue why
       setTimeout(init_animation.bind(this), 3);
 
       this.trigger_emitter.addEventListener("key_up", resume.bind(this), false);
+      this.trigger_emitter.addEventListener("key_down", resume_reverse.bind(this), false);
       this.el.addEventListener("animationcomplete", pause.bind(this), false);
 
     }

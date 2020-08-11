@@ -2,7 +2,6 @@
 const {cleanDOMId} = require('../js_components/utils.js')
 
 // timeline controller component needs to be applied to the same DOM el as animation-timeline component
-
 const register_animation_timeline_controller = function() {
   AFRAME.registerComponent('animation-timeline-controller', {
     schema: {
@@ -24,6 +23,16 @@ const register_animation_timeline_controller = function() {
       const resume = function() {
         this.el.components['animation-timeline'].animationIsPlaying = true;
       }
+      const resume_reverse = function() {
+        console.log(this.el.components['animation-timeline'].timeline.direction)
+        this.el.components['animation-timeline'].timeline.direction = "reverse"
+
+        //this.el.components.['animation-timeline'].direction = "reverse";
+
+        //console.log(this.el.components.['animation-timeline'].direction)
+       this.el.components['animation-timeline'].animationIsPlaying = true;
+      }
+
       const pause = function() {
         // !!! bad workaround for animation-timeline buggy pauseEvents feature
         this.el.components['animation-timeline'].animationIsPlaying = false
@@ -31,10 +40,12 @@ const register_animation_timeline_controller = function() {
         // this.el.emit('timeline-pause');
       }
 
-      // !!! workaround: must wait for DOM to load, doesn't iwork with eventListener, no clue why
+      // !!! workaround: must wait for DOM to load,
+      // doesn't work with eventListener(DOMContentLoaded), no clue why
       setTimeout(init_animation.bind(this), 3);
 
       this.trigger_emitter.addEventListener("key_up", resume.bind(this), false);
+      this.trigger_emitter.addEventListener("key_down", resume_reverse.bind(this), false);
       this.el.addEventListener("animationcomplete", pause.bind(this), false);
 
     }
@@ -43,7 +54,37 @@ const register_animation_timeline_controller = function() {
 
 exports.register_animation_timeline_controller = register_animation_timeline_controller
 
-},{"../js_components/utils.js":7}],2:[function(require,module,exports){
+},{"../js_components/utils.js":8}],2:[function(require,module,exports){
+const {cleanDOMId} = require('../js_components/utils.js')
+
+// timeline controller component needs to be applied to the same DOM el as animation-timeline component
+const register_camera_controller = function() {
+  AFRAME.registerComponent('camera-controller', {
+    schema: {
+      duration: {type: 'string'}
+    },
+
+    init: function () {
+      console.log(this.el);
+      //const trigger_id = cleanDOMId(this.data.triggerEmitterId);
+      //this.trigger_emitter = document.getElementById(trigger_id);
+      this.duration = parseFloat(this.data.duration)
+      //if(!this.trigger_emitter) throw new Error("Trigger emitter: " + trigger_id + " wasn't found in the DOM, check the ID or add the trigger emitter")
+      //this.trigger_emitter.addEventListener("key_up", resume.bind(this), false);
+      //this.trigger_emitter.addEventListener("key_down", resume_reverse.bind(this), false);
+      //this.el.addEventListener("animationcomplete", pause.bind(this), false);
+    },
+
+    tick: function (time, timeDelta) {
+      var currPos = this.el.object3D.position;
+      this.el.object3D.position.set(currPos.x + 1, currPos.y + 1, currPos.z + 1);
+    }
+  })
+}
+
+exports.register_camera_controller = register_camera_controller
+
+},{"../js_components/utils.js":8}],3:[function(require,module,exports){
 
 const register_keyframe_event_emitter = function() {
     AFRAME.registerComponent('keyboard-event-emitter', {
@@ -91,7 +132,7 @@ const register_keyframe_event_emitter = function() {
 
 exports.register_keyframe_event_emitter = register_keyframe_event_emitter
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 const PCDLoader = require("../libs/PCDLoader.js");
 
 const register_pcd_model = function() {
@@ -141,7 +182,7 @@ const register_pcd_model = function() {
 
 exports.register_pcd_model = register_pcd_model
 
-},{"../libs/PCDLoader.js":8}],4:[function(require,module,exports){
+},{"../libs/PCDLoader.js":9}],5:[function(require,module,exports){
 const {loadJSON} = require('../js_components/utils.js')
 
 const register_template_switcher = function() {
@@ -294,7 +335,7 @@ const register_template_switcher = function() {
 }
 exports.register_template_switcher = register_template_switcher
 
-},{"../js_components/utils.js":7}],5:[function(require,module,exports){
+},{"../js_components/utils.js":8}],6:[function(require,module,exports){
 const register_a_data = function() {
   AFRAME.registerPrimitive('a-data', {
     // Defaults the ocean to be parallel to the ground.
@@ -311,7 +352,7 @@ const register_a_data = function() {
 
 exports.register_a_data = register_a_data
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 const {loadJSON} = require('../js_components/utils.js')
 
 const timeline_json_path = '../../assets/data/timeline.json'
@@ -458,7 +499,7 @@ const timeline = function() {
 
 exports.timeline = timeline
 
-},{"../js_components/utils.js":7}],7:[function(require,module,exports){
+},{"../js_components/utils.js":8}],8:[function(require,module,exports){
 const loadJSON = function(path, callback) {
 
     var xobj = new XMLHttpRequest();
@@ -484,7 +525,7 @@ const cleanDOMId = function(id) {
 exports.loadJSON = loadJSON
 exports.cleanDOMId = cleanDOMId
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 /**
  * @author Filipe Caixeta / http://filipecaixeta.com.br
  * @author Mugen87 / https://github.com/Mugen87
@@ -895,13 +936,13 @@ PCDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 module.exports = PCDLoader;
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 // aframe components
 const {register_pcd_model} = require("./a_components/pcd_model.js");
 const {register_template_switcher} = require("./a_components/template_switcher.js");
 const {register_keyframe_event_emitter} = require("./a_components/keyboard_event_emitter.js");
 const {register_animation_timeline_controller} = require("./a_components/animation_timeline_controller.js");
-
+const {register_camera_controller} = require("./a_components/camera_controller.js");
 
 //aframe  primitives
 const {register_a_data} = require("./a_primitives/a_data.js")
@@ -913,7 +954,7 @@ const {timeline} = require("./js_components/timeline.js");
     register_pcd_model();
     register_template_switcher();
     register_keyframe_event_emitter();
-    register_animation_timeline_controller();
+    register_camera_controller();
 
     //aframe primitives
     register_a_data();
@@ -922,4 +963,4 @@ const {timeline} = require("./js_components/timeline.js");
     timeline();
 })()
 
-},{"./a_components/animation_timeline_controller.js":1,"./a_components/keyboard_event_emitter.js":2,"./a_components/pcd_model.js":3,"./a_components/template_switcher.js":4,"./a_primitives/a_data.js":5,"./js_components/timeline.js":6}]},{},[9]);
+},{"./a_components/animation_timeline_controller.js":1,"./a_components/camera_controller.js":2,"./a_components/keyboard_event_emitter.js":3,"./a_components/pcd_model.js":4,"./a_components/template_switcher.js":5,"./a_primitives/a_data.js":6,"./js_components/timeline.js":7}]},{},[10]);
