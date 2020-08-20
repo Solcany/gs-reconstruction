@@ -4,6 +4,7 @@ const {register_template_switcher} = require("./a_components/template_switcher.j
 const {register_keyframe_event_emitter} = require("./a_components/keyboard_event_emitter.js");
 const {register_animation_timeline_controller} = require("./a_components/animation_timeline_controller.js");
 const {register_camera_controller} = require("./a_components/camera_controller.js");
+const {register_scene_drape} = require("./a_components/scene_drape.js");
 
 //aframe  primitives
 const {register_a_data} = require("./a_primitives/a_data.js")

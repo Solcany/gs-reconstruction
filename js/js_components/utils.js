@@ -17,7 +17,7 @@ const cleanDOMId = function(id) {
           return id.replace('#', '');
       } else {
           return id;
-       }
+      }
 }
 
 exports.loadJSON = loadJSON
