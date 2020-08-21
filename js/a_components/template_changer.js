@@ -1,21 +1,25 @@
 const {loadJSON} = require('../js_components/utils.js')
+const {SCENARIO1_DATA} = require('../../assets/data/scenario1_data.js')
 
-const register_template_switcher = function() {
-  AFRAME.registerComponent('template-switcher', {
+
+const register_template_changer = function() {
+  AFRAME.registerComponent('template-changer', {
     schema: {
-      parseAudio: {type: 'boolean', default: false},
-      fromJson: {type: 'string'}
-    },
+      uiEmitterId: {type: 'string'}
+      //parseAudio: {type: 'boolean', default: false},
+      //fromJson: {type: 'string'}
+   },
 
     // emitts: 'template_set'
     init: function () {
-      this.index = 0;
-      this.manage_templates_();
+      // if(this.data.parseAudio) {
+      //   this.manage_audio();
+      // }
 
-      if(this.data.parseAudio) {
-        this.manage_audio();
-      }
+
     },
+
+
 
     set_template: function(path) {
       this.el.setAttribute('template', 'src', path);
@@ -24,74 +28,6 @@ const register_template_switcher = function() {
         function() { this.el.emit('template_set', null, false) }.bind(this)
         ,100)
     },
-
-    manage_templates: function() {
-      // cycle between templates on key press
-
-      const keyboard_emitter = document.getElementById("keyboard-emitter");
-      if (!keyboard_emitter) throw new Error("keyboard emitter wasn't found in the DOM, add <a-entity id='keyboard-emitter' keyboard-event-emitter></a-entity> to DOM")
-
-      var paths = [];
-
-      if(this.data.fromJson) {
-        loadJSON(this.data.fromJson, function(response) {
-          templates = JSON.parse(response);
-          for (let i = 0; i < templates.length; i++) {
-            let template = templates[i]
-            let path = template["template_path"]
-            paths.push(path)
-          }
-        })
-      } else {
-        throw new Error("no templates paths provided for this template switcher")
-      }
-
-      const increase_index = function() {
-        this.index += 1
-        if(this.index === this.data.templates.length) this.index = 0;
-        let path = paths[this.index]
-        this.set_template(path);
-      }
-      const decrease_index = function() {
-        if(this.index > 0) this.index -= 1;
-        let path = paths[this.index]
-        this.set_template(path);
-      }
-      keyboard_emitter.addEventListener('key_right', increase_index.bind(this), false);
-      keyboard_emitter.addEventListener('key_left', decrease_index.bind(this), false);
-    },
-
-    manage_templates_: function() {
-      // cycle between templates on key press
-
-      // from timeline
-      const timeline = document.getElementById("timeline");
-      if(!timeline) throw new Error("div#timeline is missing from DOM, create one manually at the top of the document")
-
-      const process_event = function(self, event) {
-        let data = event.detail.data
-        let path = data["template_path"]
-        this.set_template(path);
-      }
-
-      timeline.addEventListener("timeline_change",
-                                process_event.bind(this, event))
-      // let templates;
-
-      // if(this.data.fromJson) {
-      //   loadJSON(this.data.fromJson, function(response) {
-      //     templates = JSON.parse(response);
-      //     for (let i = 0; i < templates.length; i++) {
-      //       let template = templates[i]
-      //       let path = template["template_path"]
-      //       paths.push(path)
-      //     }
-      //   });
-      // } else {
-      //   throw new Error("no templates paths provided for this template switcher")
-      // }
-
-        },
 
     manage_audio: function() {
       // play any audio present in the templates.
@@ -128,24 +64,9 @@ const register_template_switcher = function() {
         }
       }
 
-      this.el.addEventListener('template_set', play_audio.bind(this), false);
+      //this.el.addEventListener('template_set', play_audio.bind(this), false);
     }
 
-
-    // tick: function (time) {
-    //   // Swap every second.
-    //   var self = this;
-    //   if (time - this.time < 2000) { return; }
-    //   this.time = time;
-
-    //   // Set template.
-    //   this.maskEl.emit('fade');
-    //   setTimeout(function () {
-    //     self.el.setAttribute('template', 'src', self.data[self.index++]);
-    //     self.maskEl.emit('fade');
-    //     if (self.index === self.data.length) { self.index = 0; }
-    //   }, 200);
-    // }
   });
 }
-exports.register_template_switcher = register_template_switcher
+exports.register_template_changer = register_template_changer

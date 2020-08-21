@@ -5,10 +5,12 @@ const {register_keyframe_event_emitter} = require("./a_components/keyboard_event
 const {register_animation_timeline_controller} = require("./a_components/animation_timeline_controller.js");
 const {register_camera_controller} = require("./a_components/camera_controller.js");
 const {register_scene_drape} = require("./a_components/scene_drape.js");
+const {register_template_changer} = require("./a_components/template_changer.js");
 
 //aframe  primitives
 const {register_a_data} = require("./a_primitives/a_data.js")
 // js components
+const {ui} = require("./js_components/ui.js");
 const {timeline} = require("./js_components/timeline.js");
 
 (function () {
@@ -17,10 +19,12 @@ const {timeline} = require("./js_components/timeline.js");
     register_template_switcher();
     register_keyframe_event_emitter();
     register_camera_controller();
+    register_template_changer();
 
     //aframe primitives
     register_a_data();
 
     //DOM
-    timeline();
+    ui();
+    //timeline();
 })()

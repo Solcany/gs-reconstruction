@@ -1,4 +1,22 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+const SCENARIO1_DATA = [
+    {node_introduction:
+     [{next_story_node: "show_frame_1",
+       next_aframe_template_path: "path"},
+      {next_story_node: "show_frame_2",
+       next_aframe_template_path: "path2"}]
+    },
+    {node_dont_cas_me:
+     [{next_story_node: "show_frame_1",
+       next_aframe_template_path: "path"},
+      {next_story_node: "show_frame_2",
+       next_aframe_template_path: "path2"}]
+    }
+]
+
+exports.SCENARIO1_DATA = SCENARIO1_DATA
+
+},{}],2:[function(require,module,exports){
 const {cleanDOMId} = require('../js_components/utils.js')
 
 // timeline controller component needs to be applied to the same DOM el as animation-timeline component
@@ -54,7 +72,7 @@ const register_animation_timeline_controller = function() {
 
 exports.register_animation_timeline_controller = register_animation_timeline_controller
 
-},{"../js_components/utils.js":9}],2:[function(require,module,exports){
+},{"../js_components/utils.js":12}],3:[function(require,module,exports){
 const {cleanDOMId} = require('../js_components/utils.js')
 
 // timeline controller component needs to be applied to the same DOM el as animation-timeline component
@@ -84,7 +102,7 @@ const register_camera_controller = function() {
 
 exports.register_camera_controller = register_camera_controller
 
-},{"../js_components/utils.js":9}],3:[function(require,module,exports){
+},{"../js_components/utils.js":12}],4:[function(require,module,exports){
 
 const register_keyframe_event_emitter = function() {
     AFRAME.registerComponent('keyboard-event-emitter', {
@@ -132,7 +150,7 @@ const register_keyframe_event_emitter = function() {
 
 exports.register_keyframe_event_emitter = register_keyframe_event_emitter
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 const PCDLoader = require("../libs/PCDLoader.js");
 
 const register_pcd_model = function() {
@@ -182,7 +200,7 @@ const register_pcd_model = function() {
 
 exports.register_pcd_model = register_pcd_model
 
-},{"../libs/PCDLoader.js":10}],5:[function(require,module,exports){
+},{"../libs/PCDLoader.js":13}],6:[function(require,module,exports){
 const {cleanDOMId} = require('../js_components/utils.js')
 
 const register_scene_drape = function() {
@@ -205,7 +223,81 @@ const register_scene_drape = function() {
 
 exports.register_scene_drape = register_scene_drape
 
-},{"../js_components/utils.js":9}],6:[function(require,module,exports){
+},{"../js_components/utils.js":12}],7:[function(require,module,exports){
+const {loadJSON} = require('../js_components/utils.js')
+const {SCENARIO1_DATA} = require('../../assets/data/scenario1_data.js')
+
+
+const register_template_changer = function() {
+  AFRAME.registerComponent('template-changer', {
+    schema: {
+      uiEmitterId: {type: 'string'}
+      //parseAudio: {type: 'boolean', default: false},
+      //fromJson: {type: 'string'}
+   },
+
+    // emitts: 'template_set'
+    init: function () {
+      // if(this.data.parseAudio) {
+      //   this.manage_audio();
+      // }
+
+
+    },
+
+
+
+    set_template: function(path) {
+      this.el.setAttribute('template', 'src', path);
+      // wait 100 ms before emitting the 'set' event
+      setTimeout(
+        function() { this.el.emit('template_set', null, false) }.bind(this)
+        ,100)
+    },
+
+    manage_audio: function() {
+      // play any audio present in the templates.
+      // audio element <a-sound> needs to be created manually in DOM
+      // fires when a new template is loaded, listens to 'template_set' event
+
+      const sound_el = document.getElementById("audio-player");
+      if (!sound_el) throw new Error("a-sound element wasn't found in the DOM, add <a-sound id='audio-player' src='' positional='false'></a-sound> to DOM")
+
+      const sound_player = sound_el.components.sound
+      sound_player.stopSound();
+
+      const play_audio = function() {
+        // get the html content of the currently loaded aframe template
+        const template_html = this.el.components.template.el
+
+        // get all a-data elements from the current aframe template
+        const data_html = template_html.getElementsByTagName("a-data");
+        const data = Array.from(data_html);
+
+        // get audio datai
+        const audio = data.filter(datum => datum.getAttribute('kind') === 'audio')// === 'audio')
+        if(audio.length === 0) console.warn("this template has no audio attached")
+
+        //play attached audio (if there's any in the template)
+        if(audio.length > 0) {
+          // WIP: currently plays only the first audio source in the template
+          const src = audio[0].getAttribute('data')
+          sound_el.setAttribute('sound','src', src);
+          sound_player.playSound();
+
+        } else {
+          return;
+        }
+      }
+
+      //this.el.addEventListener('template_set', play_audio.bind(this), false);
+    }
+
+  });
+}
+exports.register_template_changer = register_template_changer
+
+},{"../../assets/data/scenario1_data.js":1,"../js_components/utils.js":12}],8:[function(require,module,exports){
 const {loadJSON} = require('../js_components/utils.js')
 
 const register_template_switcher = function() {
@@ -358,7 +450,7 @@ const register_template_switcher = function() {
 }
 exports.register_template_switcher = register_template_switcher
 
-},{"../js_components/utils.js":9}],7:[function(require,module,exports){
+},{"../js_components/utils.js":12}],9:[function(require,module,exports){
 const register_a_data = function() {
   AFRAME.registerPrimitive('a-data', {
     // Defaults the ocean to be parallel to the ground.
@@ -375,7 +467,7 @@ const register_a_data = function() {
 
 exports.register_a_data = register_a_data
 
-},{}],8:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 const {loadJSON} = require('../js_components/utils.js')
 
 const timeline_json_path = '../../assets/data/timeline.json'
@@ -522,7 +614,75 @@ const timeline = function() {
 
 exports.timeline = timeline
 
-},{"../js_components/utils.js":9}],9:[function(require,module,exports){
+},{"../js_components/utils.js":12}],11:[function(require,module,exports){
+const {SCENARIO1_DATA} = require('../../assets/data/scenario1_data.js')
+
+const ui = function() {
+    this.ui_data = SCENARIO1_DATA;
+
+    this.init = function() {
+        window.addEventListener('DOMContentLoaded', function() {
+            this.create_ui();
+            this.listen();
+        })
+    }
+
+    this.listen = function() {
+        const ui = document.getElementById("story-ui")
+        ui.addEventListener("advance_story", function(e) {
+            console.log(e)
+        })
+    }
+
+    this.create_ui = function() {
+        const body = document.getElementsByTagName('BODY')[0]
+        const ui = document.createElement('nav')
+        const ul = document.createElement('ul')
+        ui.id = "story-ui"
+
+        for(i = 0; i < this.ui_data.length; i++) {
+            const li = document.createElement('li')
+
+            const node = this.ui_data[i]
+            const node_key = Object.keys(node)[0]
+            const node_data = node[node_key]
+
+            for(u = 0; u < node_data.length; u++) {
+                // create button element for each timeline event
+                const button = document.createElement('button');
+                button.type ="button"
+                button.innerHTML = u + 1;
+
+                const next_node = node_data[u]
+                // the button dispatches event on click
+                button.addEventListener("click", function() {
+                    const event = new CustomEvent("advance_story", {
+                        detail: {
+                            next_story_node: next_node.next_story_node,
+                            next_aframe_template_path: next_node.next_aframe_template_path
+                        }
+                    });
+                    ui.dispatchEvent(event);
+                })
+
+                li.appendChild(button);
+            }
+
+            ul.appendChild(li);
+        }
+
+        ui.appendChild(ul);
+        body.appendChild(ui);
+
+    }
+
+    this.init();
+}
+
+
+exports.ui = ui
+
+},{"../../assets/data/scenario1_data.js":1}],12:[function(require,module,exports){
 const loadJSON = function(path, callback) {
 
     var xobj = new XMLHttpRequest();
@@ -548,7 +708,7 @@ const cleanDOMId = function(id) {
 exports.loadJSON = loadJSON
 exports.cleanDOMId = cleanDOMId
 
-},{}],10:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 /**
  * @author Filipe Caixeta / http://filipecaixeta.com.br
  * @author Mugen87 / https://github.com/Mugen87
@@ -959,7 +1119,7 @@ PCDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 module.exports = PCDLoader;
 
-},{}],11:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 // aframe components
 const {register_pcd_model} = require("./a_components/pcd_model.js");
 const {register_template_switcher} = require("./a_components/template_switcher.js");
@@ -967,10 +1127,12 @@ const {register_keyframe_event_emitter} = require("./a_components/keyboard_event
 const {register_animation_timeline_controller} = require("./a_components/animation_timeline_controller.js");
 const {register_camera_controller} = require("./a_components/camera_controller.js");
 const {register_scene_drape} = require("./a_components/scene_drape.js");
+const {register_template_changer} = require("./a_components/template_changer.js");
 
 //aframe  primitives
 const {register_a_data} = require("./a_primitives/a_data.js")
 // js components
+const {ui} = require("./js_components/ui.js");
 const {timeline} = require("./js_components/timeline.js");
 
 (function () {
@@ -979,12 +1141,14 @@ const {timeline} = require("./js_components/timeline.js");
     register_template_switcher();
     register_keyframe_event_emitter();
     register_camera_controller();
+    register_template_changer();
 
     //aframe primitives
     register_a_data();
 
     //DOM
-    timeline();
+    ui();
+    //timeline();
 })()
 
-},{"./a_components/animation_timeline_controller.js":1,"./a_components/camera_controller.js":2,"./a_components/keyboard_event_emitter.js":3,"./a_components/pcd_model.js":4,"./a_components/scene_drape.js":5,"./a_components/template_switcher.js":6,"./a_primitives/a_data.js":7,"./js_components/timeline.js":8}]},{},[11]);
+},{"./a_components/animation_timeline_controller.js":2,"./a_components/camera_controller.js":3,"./a_components/keyboard_event_emitter.js":4,"./a_components/pcd_model.js":5,"./a_components/scene_drape.js":6,"./a_components/template_changer.js":7,"./a_components/template_switcher.js":8,"./a_primitives/a_data.js":9,"./js_components/timeline.js":10,"./js_components/ui.js":11}]},{},[14]);

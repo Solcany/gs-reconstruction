@@ -1,0 +1,19 @@
+nav#story-ui {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    z-index: $z-top;
+    height: 100px;
+        background-color: red;
+
+    ul {
+        width: 100%;
+
+        background-color: red;
+        li {
+            button {
+               // padding: 0 2em;
+            }
+        }
+    }
+}
