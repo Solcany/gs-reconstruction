@@ -1,4 +1,12 @@
+// utils
+const {addHashToString} = require('./utils.js')
+
+
+// vars
 const {SCENARIO1_DATA} = require('../../assets/data/scenario1_data.js')
+const INITIAL_NODE_ID = "dont_cas_me"
+
+
 
 const ui = function() {
     this.ui_data = SCENARIO1_DATA;
@@ -6,15 +14,17 @@ const ui = function() {
     this.init = function() {
         window.addEventListener('DOMContentLoaded', function() {
             this.create_ui();
-            this.listen();
+            this.manage_ui();
+            this.show_node(INITIAL_NODE_ID);
         })
     }
 
-    this.listen = function() {
+    this.manage_ui = function() {
         const ui = document.getElementById("story-ui")
         ui.addEventListener("advance_story", function(e) {
-            console.log(e)
-        })
+            const next_node_id = e.detail.next_story_node
+            this.show_node(next_node_id);
+        }.bind(this))
     }
 
     this.create_ui = function() {
@@ -47,7 +57,9 @@ const ui = function() {
                     });
                     ui.dispatchEvent(event);
                 })
-
+               
+                li.id = node_key
+                li.setAttribute("active",false)
                 li.appendChild(button);
             }
 
@@ -56,7 +68,20 @@ const ui = function() {
 
         ui.appendChild(ul);
         body.appendChild(ui);
+    }
 
+    this.show_node = function(nodeId) {
+        const ui = document.getElementById("story-ui")
+        const current_node = ui.querySelector("li[active=true]");
+
+        // hide current node
+        if(current_node) current_node.setAttribute("active", false)
+
+        // show the next
+        const id = addHashToString(nodeId)
+        const next_node = ui.querySelector(id);
+        if(!next_node) throw new Error("nav node with id: " + nodeID + " wasnt found in story-ui")
+        next_node.setAttribute("active", true)
     }
 
     this.init();

@@ -1,14 +1,15 @@
 const SCENARIO1_DATA = [
-    {node_introduction:
-     [{next_story_node: "show_frame_1",
+    {introduction:
+     [{next_story_node: "dont_cas_me",
        next_aframe_template_path: "path"},
-      {next_story_node: "show_frame_2",
+      {next_story_node: "dont_cas_me",
        next_aframe_template_path: "path2"}]
     },
-    {node_dont_cas_me:
-     [{next_story_node: "show_frame_1",
+   
+    {dont_cas_me:
+     [{next_story_node: "introduction",
        next_aframe_template_path: "path"},
-      {next_story_node: "show_frame_2",
+      {next_story_node: "introduction",
        next_aframe_template_path: "path2"}]
     }
 ]

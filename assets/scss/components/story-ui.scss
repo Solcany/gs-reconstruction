@@ -11,6 +11,15 @@ nav#story-ui {
 
         background-color: red;
         li {
+
+            &[active="false"] {
+                display: none;
+            }
+
+            &[active="true"] {
+                display: block;
+            }
+
             button {
                // padding: 0 2em;
             }

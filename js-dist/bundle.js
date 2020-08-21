@@ -1,15 +1,16 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 const SCENARIO1_DATA = [
-    {node_introduction:
-     [{next_story_node: "show_frame_1",
+    {introduction:
+     [{next_story_node: "dont_cas_me",
        next_aframe_template_path: "path"},
-      {next_story_node: "show_frame_2",
+      {next_story_node: "dont_cas_me",
        next_aframe_template_path: "path2"}]
     },
-    {node_dont_cas_me:
-     [{next_story_node: "show_frame_1",
+   
+    {dont_cas_me:
+     [{next_story_node: "introduction",
        next_aframe_template_path: "path"},
-      {next_story_node: "show_frame_2",
+      {next_story_node: "introduction",
        next_aframe_template_path: "path2"}]
     }
 ]
@@ -615,7 +616,15 @@ const timeline = function() {
 exports.timeline = timeline
 
 },{"../js_components/utils.js":12}],11:[function(require,module,exports){
+// utils
+const {addHashToString} = require('./utils.js')
+
+
+// vars
 const {SCENARIO1_DATA} = require('../../assets/data/scenario1_data.js')
+const INITIAL_NODE_ID = "dont_cas_me"
+
+
 
 const ui = function() {
     this.ui_data = SCENARIO1_DATA;
@@ -623,15 +632,17 @@ const ui = function() {
     this.init = function() {
         window.addEventListener('DOMContentLoaded', function() {
             this.create_ui();
-            this.listen();
+            this.manage_ui();
+            this.show_node(INITIAL_NODE_ID);
         })
     }
 
-    this.listen = function() {
+    this.manage_ui = function() {
         const ui = document.getElementById("story-ui")
         ui.addEventListener("advance_story", function(e) {
-            console.log(e)
-        })
+            const next_node_id = e.detail.next_story_node
+            this.show_node(next_node_id);
+        }.bind(this))
     }
 
     this.create_ui = function() {
@@ -664,7 +675,9 @@ const ui = function() {
                     });
                     ui.dispatchEvent(event);
                 })
-
+               
+                li.id = node_key
+                li.setAttribute("active",false)
                 li.appendChild(button);
             }
 
@@ -673,7 +686,20 @@ const ui = function() {
 
         ui.appendChild(ul);
         body.appendChild(ui);
+    }
 
+    this.show_node = function(nodeId) {
+        const ui = document.getElementById("story-ui")
+        const current_node = ui.querySelector("li[active=true]");
+
+        // hide current node
+        if(current_node) current_node.setAttribute("active", false)
+
+        // show the next
+        const id = addHashToString(nodeId)
+        const next_node = ui.querySelector(id);
+        if(!next_node) throw new Error("nav node with id: " + nodeID + " wasnt found in story-ui")
+        next_node.setAttribute("active", true)
     }
 
     this.init();
@@ -682,7 +708,7 @@ const ui = function() {
 
 exports.ui = ui
 
-},{"../../assets/data/scenario1_data.js":1}],12:[function(require,module,exports){
+},{"../../assets/data/scenario1_data.js":1,"./utils.js":12}],12:[function(require,module,exports){
 const loadJSON = function(path, callback) {
 
     var xobj = new XMLHttpRequest();
@@ -705,8 +731,17 @@ const cleanDOMId = function(id) {
       }
 }
 
+const addHashToString = function(string) {
+      if (string.includes('#')) {
+          return string
+      } else {
+          return '#' + string;
+      }
+}
+
 exports.loadJSON = loadJSON
 exports.cleanDOMId = cleanDOMId
+exports.addHashToString = addHashToString
 
 },{}],13:[function(require,module,exports){
 /**

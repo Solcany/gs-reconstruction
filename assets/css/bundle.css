@@ -85,5 +85,11 @@ nav#story-ui ul {
   width: 100%;
   background-color: red;
 }
+nav#story-ui ul li[active=false] {
+  display: none;
+}
+nav#story-ui ul li[active=true] {
+  display: block;
+}
 
 /*# sourceMappingURL=bundle.css.map */

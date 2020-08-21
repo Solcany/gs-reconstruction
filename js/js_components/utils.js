@@ -20,5 +20,14 @@ const cleanDOMId = function(id) {
       }
 }
 
+const addHashToString = function(string) {
+      if (string.includes('#')) {
+          return string
+      } else {
+          return '#' + string;
+      }
+}
+
 exports.loadJSON = loadJSON
 exports.cleanDOMId = cleanDOMId
+exports.addHashToString = addHashToString
