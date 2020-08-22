@@ -72,12 +72,12 @@ const ui = function() {
             } else if (node_kind === 'map') {
                 const cells_ids = node_data.map(datum => datum["map_cell_id"])
                 const cells_els = cells_ids.map(id => document.getElementById(cleanDOMId(id)))
-
                 for(v = 0; v < cells_els.length; v++) {
-                    const cell_el = cells_els[i]
-                    const next_node = node_data[i]
+                    const cell_el = cells_els[v]
+                    const next_node = node_data[v]
 
                     cell_el.addEventListener("click", function() {
+                        console.log("clickclick")
                         const event = new CustomEvent("advance_story", {
                             detail: {
                                 next_story_node: next_node.next_story_node,

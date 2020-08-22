@@ -1,17 +1,16 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 const MULTISCENARIO_DATA = [
-    {node_meta: {kind: 'map', map_id: '#mapgrid'},
+    {node_meta: {kind: 'map', mapId: '#mapgrid'},
      overview:
      [{map_cell_id: "#f",
        next_story_node: "introduction",
        next_templates_paths: {background: "./assets/scenes/scene1/objects/man.template",
                               foreground: "./assets/scenes/scene1/objects/man.template"}},
-      {map_cell_id: "#f2",
-       next_story_node: "dont_cas_me",
+      {map_cell_id: "#ff",
+       next_story_node: "introduction",
        next_templates_paths: {background: "./assets/scenes/scene1/objects/man.template",
                               foreground: "./assets/scenes/scene1/objects/man.template"}}]
     },
-
     {node_meta: {kind: 'story'},
      introduction:
      [{next_story_node: "dont_cas_me",
@@ -717,12 +716,12 @@ const ui = function() {
             } else if (node_kind === 'map') {
                 const cells_ids = node_data.map(datum => datum["map_cell_id"])
                 const cells_els = cells_ids.map(id => document.getElementById(cleanDOMId(id)))
-
                 for(v = 0; v < cells_els.length; v++) {
-                    const cell_el = cells_els[i]
-                    const next_node = node_data[i]
+                    const cell_el = cells_els[v]
+                    const next_node = node_data[v]
 
                     cell_el.addEventListener("click", function() {
+                        console.log("clickclick")
                         const event = new CustomEvent("advance_story", {
                             detail: {
                                 next_story_node: next_node.next_story_node,

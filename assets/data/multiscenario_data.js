@@ -1,16 +1,15 @@
 const MULTISCENARIO_DATA = [
-    {node_meta: {kind: 'map', map_id: '#mapgrid'},
+    {node_meta: {kind: 'map', mapId: '#mapgrid'},
      overview:
      [{map_cell_id: "#f",
        next_story_node: "introduction",
        next_templates_paths: {background: "./assets/scenes/scene1/objects/man.template",
                               foreground: "./assets/scenes/scene1/objects/man.template"}},
-      {map_cell_id: "#f2",
-       next_story_node: "dont_cas_me",
+      {map_cell_id: "#ff",
+       next_story_node: "introduction",
        next_templates_paths: {background: "./assets/scenes/scene1/objects/man.template",
                               foreground: "./assets/scenes/scene1/objects/man.template"}}]
     },
-
     {node_meta: {kind: 'story'},
      introduction:
      [{next_story_node: "dont_cas_me",
