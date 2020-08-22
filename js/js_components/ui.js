@@ -1,15 +1,12 @@
 // utils
 const {addHashToString} = require('./utils.js')
 
-
 // vars
-const {SCENARIO1_DATA} = require('../../assets/data/scenario1_data.js')
+const {MULTISCENARIO_DATA} = require('../../assets/data/multiscenario_data.js')
 const INITIAL_NODE_ID = "dont_cas_me"
 
-
-
 const ui = function() {
-    this.ui_data = SCENARIO1_DATA;
+    this.ui_data = MULTISCENARIO_DATA
 
     this.init = function() {
         window.addEventListener('DOMContentLoaded', function() {
@@ -34,36 +31,43 @@ const ui = function() {
         ui.id = "story-ui"
 
         for(i = 0; i < this.ui_data.length; i++) {
-            const li = document.createElement('li')
 
             const node = this.ui_data[i]
             const node_key = Object.keys(node)[0]
             const node_data = node[node_key]
+            const has_dom_el = node_data.has_dom_el
 
-            for(u = 0; u < node_data.length; u++) {
-                // create button element for each timeline event
-                const button = document.createElement('button');
-                button.type ="button"
-                button.innerHTML = u + 1;
+            if(!has_dom_el) {
+                // generate list element for interaction control
+                const li = document.createElement('li')
 
-                const next_node = node_data[u]
-                // the button dispatches event on click
-                button.addEventListener("click", function() {
-                    const event = new CustomEvent("advance_story", {
-                        detail: {
-                            next_story_node: next_node.next_story_node,
-                            next_aframe_template_path: next_node.next_aframe_template_path
-                        }
-                    });
-                    ui.dispatchEvent(event);
-                })
-               
-                li.id = node_key
-                li.setAttribute("active",false)
-                li.appendChild(button);
+                for(u = 0; u < node_data.length; u++) {
+                    // create button element for each timeline event
+                    const button = document.createElement('button');
+                    button.type ="button"
+                    button.innerHTML = u + 1;
+
+                    const next_node = node_data[u]
+                    // the button dispatches event on click
+                    button.addEventListener("click", function() {
+                        const event = new CustomEvent("advance_story", {
+                            detail: {
+                                next_story_node: next_node.next_story_node,
+                                next_templates_paths: next_node.next_templates_paths
+                            }
+                        });
+                        ui.dispatchEvent(event);
+                    })
+
+                    li.id = node_key
+                    li.setAttribute("active",false)
+                    li.appendChild(button);
+                }
+                ul.appendChild(li)
+            } else {
+               // add interaction to an already existing DOM element
+
             }
-
-            ul.appendChild(li);
         }
 
         ui.appendChild(ul);

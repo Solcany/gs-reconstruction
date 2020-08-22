@@ -82,8 +82,14 @@ nav#story-ui {
   background-color: red;
 }
 nav#story-ui ul {
+  position: relative;
   width: 100%;
   background-color: red;
+}
+nav#story-ui ul li {
+  position: absolute;
+  left: 0;
+  top: 0;
 }
 nav#story-ui ul li[active=false] {
   display: none;

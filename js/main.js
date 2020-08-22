@@ -14,6 +14,8 @@ const {ui} = require("./js_components/ui.js");
 const {timeline} = require("./js_components/timeline.js");
 
 (function () {
+    //DOM
+        
     //aframe components
     register_pcd_model();
     register_template_switcher();
@@ -26,5 +28,5 @@ const {timeline} = require("./js_components/timeline.js");
 
     //DOM
     ui();
-    //timeline();
+
 })()

@@ -39,7 +39,7 @@
 
             <a-entity id="template-switcher"
                       template="src: ./assets/scenes/scene1/objects/man.template"
-                      template-changer></a-entity>
+                      template-changer="interactionEmitterId: #story-ui; interactionEvent: advance_story; templatePathKind: foreground"></a-entity>
 
             <!-- main camera -->
             <a-entity id="rig" geometry="primitive: box" look-at="#floor" position="-9 12 15">

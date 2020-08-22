@@ -6,11 +6,14 @@ nav#story-ui {
     height: 100px;
         background-color: red;
 
-    ul {
+        ul {
+            position: relative;
         width: 100%;
-
         background-color: red;
         li {
+            position: absolute;
+            left: 0;
+            top: 0;
 
             &[active="false"] {
                 display: none;

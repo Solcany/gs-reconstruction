@@ -1,21 +1,40 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
-const SCENARIO1_DATA = [
-    {introduction:
-     [{next_story_node: "dont_cas_me",
-       next_aframe_template_path: "path"},
-      {next_story_node: "dont_cas_me",
-       next_aframe_template_path: "path2"}]
+const MULTISCENARIO_DATA = [
+    {overview:
+     [{has_dom_el: '#el',
+       next_story_node: "dont_cas_me",
+       next_templates_paths: {background: "./assets/scenes/scene1/objects/man.template",
+                              foreground: "./assets/scenes/scene1/objects/man.template"}},
+      {has_dom_el: '#el2',
+       next_story_node: "dont_cas_me",
+       next_templates_paths: {background: "./assets/scenes/scene1/objects/man.template",
+                              foreground: "./assets/scenes/scene1/objects/man.template"}}]
     },
-   
+
+    {introduction:
+     [{has_dom_el: null,
+       next_story_node: "dont_cas_me",
+       next_templates_paths: {background: "./assets/scenes/scene1/objects/man.template",
+                              foreground: "./assets/scenes/scene1/objects/man.template"}},
+      {has_dom_el: null,
+       next_story_node: "dont_cas_me",
+       next_templates_paths: {background: "./assets/scenes/scene1/objects/man.template",
+                              foreground: "./assets/scenes/scene1/objects/man.template"}}]
+    },
+
     {dont_cas_me:
-     [{next_story_node: "introduction",
-       next_aframe_template_path: "path"},
-      {next_story_node: "introduction",
-       next_aframe_template_path: "path2"}]
-    }
+     [{has_dom_el: null,
+       next_story_node: "introduction",
+       next_templates_paths: {background: "./assets/scenes/scene1/objects/man3.template",
+                              foreground: "./assets/scenes/scene1/objects/man3.template"}},
+      {has_dom_el: null,
+       next_story_node: "introduction",
+       next_templates_paths: {background: "./assets/scenes/scene1/objects/man3.template",
+                              foreground: "./assets/scenes/scene1/objects/man3.template"}}
+    ]}
 ]
 
-exports.SCENARIO1_DATA = SCENARIO1_DATA
+exports.MULTISCENARIO_DATA = MULTISCENARIO_DATA
 
 },{}],2:[function(require,module,exports){
 const {cleanDOMId} = require('../js_components/utils.js')
@@ -225,28 +244,37 @@ const register_scene_drape = function() {
 exports.register_scene_drape = register_scene_drape
 
 },{"../js_components/utils.js":12}],7:[function(require,module,exports){
-const {loadJSON} = require('../js_components/utils.js')
-const {SCENARIO1_DATA} = require('../../assets/data/scenario1_data.js')
-
+const {cleanDOMId} = require('../js_components/utils.js')
 
 const register_template_changer = function() {
   AFRAME.registerComponent('template-changer', {
     schema: {
-      uiEmitterId: {type: 'string'}
-      //parseAudio: {type: 'boolean', default: false},
-      //fromJson: {type: 'string'}
+      interactionEmitterId: {type: 'string'},
+      interactionEvent: {type: 'string'},
+      templatePathKind: {type: 'string'},
+      parseAudio: {type: 'boolean', default: false}
    },
 
     // emitts: 'template_set'
     init: function () {
-      // if(this.data.parseAudio) {
-      //   this.manage_audio();
-      // }
+      const emId = cleanDOMId(this.data.interactionEmitterId)
+      this.iEvent = this.data.interactionEvent
+      this.iEmitter = document.getElementById(emId)
+      this.templatePathKind = this.data.templatePathKind
 
-
+      this.handle_interaction();
     },
 
-
+    handle_interaction: function() {
+      this.iEmitter.addEventListener(this.iEvent, function(ev) {
+        const template_path = ev.detail.next_templates_paths[this.templatePathKind]
+        if(template_path) {
+          this.set_template(template_path);
+        } else {
+          return;
+        }
+      }.bind(this))
+    },
 
     set_template: function(path) {
       this.el.setAttribute('template', 'src', path);
@@ -298,7 +326,7 @@ const register_template_changer = function() {
 }
 exports.register_template_changer = register_template_changer
 
-},{"../../assets/data/scenario1_data.js":1,"../js_components/utils.js":12}],8:[function(require,module,exports){
+},{"../js_components/utils.js":12}],8:[function(require,module,exports){
 const {loadJSON} = require('../js_components/utils.js')
 
 const register_template_switcher = function() {
@@ -619,15 +647,12 @@ exports.timeline = timeline
 // utils
 const {addHashToString} = require('./utils.js')
 
-
 // vars
-const {SCENARIO1_DATA} = require('../../assets/data/scenario1_data.js')
+const {MULTISCENARIO_DATA} = require('../../assets/data/multiscenario_data.js')
 const INITIAL_NODE_ID = "dont_cas_me"
 
-
-
 const ui = function() {
-    this.ui_data = SCENARIO1_DATA;
+    this.ui_data = MULTISCENARIO_DATA
 
     this.init = function() {
         window.addEventListener('DOMContentLoaded', function() {
@@ -652,36 +677,43 @@ const ui = function() {
         ui.id = "story-ui"
 
         for(i = 0; i < this.ui_data.length; i++) {
-            const li = document.createElement('li')
 
             const node = this.ui_data[i]
             const node_key = Object.keys(node)[0]
             const node_data = node[node_key]
+            const has_dom_el = node_data.has_dom_el
 
-            for(u = 0; u < node_data.length; u++) {
-                // create button element for each timeline event
-                const button = document.createElement('button');
-                button.type ="button"
-                button.innerHTML = u + 1;
+            if(!has_dom_el) {
+                // generate list element for interaction control
+                const li = document.createElement('li')
 
-                const next_node = node_data[u]
-                // the button dispatches event on click
-                button.addEventListener("click", function() {
-                    const event = new CustomEvent("advance_story", {
-                        detail: {
-                            next_story_node: next_node.next_story_node,
-                            next_aframe_template_path: next_node.next_aframe_template_path
-                        }
-                    });
-                    ui.dispatchEvent(event);
-                })
-               
-                li.id = node_key
-                li.setAttribute("active",false)
-                li.appendChild(button);
+                for(u = 0; u < node_data.length; u++) {
+                    // create button element for each timeline event
+                    const button = document.createElement('button');
+                    button.type ="button"
+                    button.innerHTML = u + 1;
+
+                    const next_node = node_data[u]
+                    // the button dispatches event on click
+                    button.addEventListener("click", function() {
+                        const event = new CustomEvent("advance_story", {
+                            detail: {
+                                next_story_node: next_node.next_story_node,
+                                next_templates_paths: next_node.next_templates_paths
+                            }
+                        });
+                        ui.dispatchEvent(event);
+                    })
+
+                    li.id = node_key
+                    li.setAttribute("active",false)
+                    li.appendChild(button);
+                }
+                ul.appendChild(li)
+            } else {
+               // add interaction to an already existing DOM element
+
             }
-
-            ul.appendChild(li);
         }
 
         ui.appendChild(ul);
@@ -708,7 +740,7 @@ const ui = function() {
 
 exports.ui = ui
 
-},{"../../assets/data/scenario1_data.js":1,"./utils.js":12}],12:[function(require,module,exports){
+},{"../../assets/data/multiscenario_data.js":1,"./utils.js":12}],12:[function(require,module,exports){
 const loadJSON = function(path, callback) {
 
     var xobj = new XMLHttpRequest();
@@ -1171,6 +1203,8 @@ const {ui} = require("./js_components/ui.js");
 const {timeline} = require("./js_components/timeline.js");
 
 (function () {
+    //DOM
+        
     //aframe components
     register_pcd_model();
     register_template_switcher();
@@ -1183,7 +1217,7 @@ const {timeline} = require("./js_components/timeline.js");
 
     //DOM
     ui();
-    //timeline();
+
 })()
 
 },{"./a_components/animation_timeline_controller.js":2,"./a_components/camera_controller.js":3,"./a_components/keyboard_event_emitter.js":4,"./a_components/pcd_model.js":5,"./a_components/scene_drape.js":6,"./a_components/template_changer.js":7,"./a_components/template_switcher.js":8,"./a_primitives/a_data.js":9,"./js_components/timeline.js":10,"./js_components/ui.js":11}]},{},[14]);

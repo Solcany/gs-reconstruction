@@ -1,25 +1,34 @@
-const {loadJSON} = require('../js_components/utils.js')
-const {SCENARIO1_DATA} = require('../../assets/data/scenario1_data.js')
-
+const {cleanDOMId} = require('../js_components/utils.js')
 
 const register_template_changer = function() {
   AFRAME.registerComponent('template-changer', {
     schema: {
-      uiEmitterId: {type: 'string'}
-      //parseAudio: {type: 'boolean', default: false},
-      //fromJson: {type: 'string'}
+      interactionEmitterId: {type: 'string'},
+      interactionEvent: {type: 'string'},
+      templatePathKind: {type: 'string'},
+      parseAudio: {type: 'boolean', default: false}
    },
 
     // emitts: 'template_set'
     init: function () {
-      // if(this.data.parseAudio) {
-      //   this.manage_audio();
-      // }
+      const emId = cleanDOMId(this.data.interactionEmitterId)
+      this.iEvent = this.data.interactionEvent
+      this.iEmitter = document.getElementById(emId)
+      this.templatePathKind = this.data.templatePathKind
 
-
+      this.handle_interaction();
     },
 
-
+    handle_interaction: function() {
+      this.iEmitter.addEventListener(this.iEvent, function(ev) {
+        const template_path = ev.detail.next_templates_paths[this.templatePathKind]
+        if(template_path) {
+          this.set_template(template_path);
+        } else {
+          return;
+        }
+      }.bind(this))
+    },
 
     set_template: function(path) {
       this.el.setAttribute('template', 'src', path);
