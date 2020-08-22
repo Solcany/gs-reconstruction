@@ -97,5 +97,21 @@ nav#story-ui ul li[active=false] {
 nav#story-ui ul li[active=true] {
   display: block;
 }
+#mapgrid[active=false] {
+  display: none;
+}
+#mapgrid button.testbutton {
+  position: absolute;
+  top: 0;
+  z-index: 100000;
+  background-color: green;
+  padding: 20px;
+}
+#mapgrid button.testbutton#f {
+  left: 50px;
+}
+#mapgrid button.testbutton#f2 {
+  left: 200px;
+}
 
 /*# sourceMappingURL=bundle.css.map */

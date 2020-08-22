@@ -35,20 +35,31 @@
 
             <!-- scene objects -->
             <!-- always set scene objects parameters in the template file -->
-            <a-entity id="main" template="src: ./assets/scenes/scene1/main-object.template" position="0 0 0"></a-entity>
+            <a-entity id="main"
+                      template="src: ./assets/scenes/scene1/main-object.template"
+                      position="0 0 0"
+                      template-changer="interactionEmitterId: #story-ui;
+                                        interactionEvent: advance_story;
+                                        templatePathKind: background">
+            </a-entity>
 
-            <a-entity id="template-switcher"
-                      template="src: ./assets/scenes/scene1/objects/man.template"
-                      template-changer="interactionEmitterId: #story-ui; interactionEvent: advance_story; templatePathKind: foreground"></a-entity>
+            <a-entity template="src: ./assets/scenes/scene1/objects/man.template"
+                      template-changer="interactionEmitterId: #story-ui;
+                                        interactionEvent: advance_story;
+                                        templatePathKind: foreground">
+
+            </a-entity>
 
             <!-- main camera -->
             <a-entity id="rig" geometry="primitive: box" look-at="#floor" position="-9 12 15">
                 <a-entity id="overview-camera" camera="zoom: 2;" rotation="0 180 0"></a-entity>
             </a-entity>
 
-           <a-plane id="floor" position="0 0 0" rotation="-90 0 0" width="4" height="4" color="#000000"></a-plane> -->
-
+            <a-plane id="floor" position="0 0 0" rotation="-90 0 0" width="4" height="4" color="#000000"></a-plane> -->
         </a-scene>
-
+        <div id="mapgrid">
+            <button type="button" id="f" class="testbutton">button 1</button>
+            <button type="button" id="f2" class="testbutton">button 2</button>
+        </div>
     </body>
 </html>

@@ -1,34 +1,33 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 const MULTISCENARIO_DATA = [
-    {overview:
-     [{has_dom_el: '#el',
-       next_story_node: "dont_cas_me",
-       next_templates_paths: {background: "./assets/scenes/scene1/objects/man.template",
-                              foreground: "./assets/scenes/scene1/objects/man.template"}},
-      {has_dom_el: '#el2',
-       next_story_node: "dont_cas_me",
-       next_templates_paths: {background: "./assets/scenes/scene1/objects/man.template",
-                              foreground: "./assets/scenes/scene1/objects/man.template"}}]
-    },
-
-    {introduction:
-     [{has_dom_el: null,
-       next_story_node: "dont_cas_me",
-       next_templates_paths: {background: "./assets/scenes/scene1/objects/man.template",
-                              foreground: "./assets/scenes/scene1/objects/man.template"}},
-      {has_dom_el: null,
-       next_story_node: "dont_cas_me",
-       next_templates_paths: {background: "./assets/scenes/scene1/objects/man.template",
-                              foreground: "./assets/scenes/scene1/objects/man.template"}}]
-    },
-
-    {dont_cas_me:
-     [{has_dom_el: null,
+    {node_meta: {kind: 'map', map_id: '#mapgrid'},
+     overview:
+     [{map_cell_id: "#f",
        next_story_node: "introduction",
+       next_templates_paths: {background: "./assets/scenes/scene1/objects/man.template",
+                              foreground: "./assets/scenes/scene1/objects/man.template"}},
+      {map_cell_id: "#f2",
+       next_story_node: "dont_cas_me",
+       next_templates_paths: {background: "./assets/scenes/scene1/objects/man.template",
+                              foreground: "./assets/scenes/scene1/objects/man.template"}}]
+    },
+
+    {node_meta: {kind: 'story'},
+     introduction:
+     [{next_story_node: "dont_cas_me",
+       next_templates_paths: {background: "./assets/scenes/scene1/objects/man.template",
+                              foreground: "./assets/scenes/scene1/objects/man.template"}},
+      {next_story_node: "dont_cas_me",
+       next_templates_paths: {background: "./assets/scenes/scene1/objects/man.template",
+                              foreground: "./assets/scenes/scene1/objects/man.template"}}]
+    },
+
+    {node_meta: {kind: 'story'},
+     dont_cas_me:
+     [{next_story_node: "introduction",
        next_templates_paths: {background: "./assets/scenes/scene1/objects/man3.template",
                               foreground: "./assets/scenes/scene1/objects/man3.template"}},
-      {has_dom_el: null,
-       next_story_node: "introduction",
+      {next_story_node: "introduction",
        next_templates_paths: {background: "./assets/scenes/scene1/objects/man3.template",
                               foreground: "./assets/scenes/scene1/objects/man3.template"}}
     ]}
@@ -646,19 +645,24 @@ exports.timeline = timeline
 },{"../js_components/utils.js":12}],11:[function(require,module,exports){
 // utils
 const {addHashToString} = require('./utils.js')
-
+const {cleanDOMId} = require('./utils.js')
 // vars
 const {MULTISCENARIO_DATA} = require('../../assets/data/multiscenario_data.js')
 const INITIAL_NODE_ID = "dont_cas_me"
+const MAP_EL_ID = "mapgrid";
 
 const ui = function() {
     this.ui_data = MULTISCENARIO_DATA
 
+
     this.init = function() {
         window.addEventListener('DOMContentLoaded', function() {
+            // hide map
+            this.map_el = document.getElementById(cleanDOMId(MAP_EL_ID))
+            this.map_el.setAttribute("active", true)
+           
             this.create_ui();
             this.manage_ui();
-            this.show_node(INITIAL_NODE_ID);
         })
     }
 
@@ -677,13 +681,12 @@ const ui = function() {
         ui.id = "story-ui"
 
         for(i = 0; i < this.ui_data.length; i++) {
-
             const node = this.ui_data[i]
-            const node_key = Object.keys(node)[0]
-            const node_data = node[node_key]
-            const has_dom_el = node_data.has_dom_el
+            const node_kind = node["node_meta"]["kind"]
+            const node_name = Object.keys(node)[1]
+            const node_data = node[node_name]
 
-            if(!has_dom_el) {
+            if(node_kind === 'story') {
                 // generate list element for interaction control
                 const li = document.createElement('li')
 
@@ -705,17 +708,34 @@ const ui = function() {
                         ui.dispatchEvent(event);
                     })
 
-                    li.id = node_key
+                    li.id = node_name
                     li.setAttribute("active",false)
                     li.appendChild(button);
                 }
                 ul.appendChild(li)
-            } else {
-               // add interaction to an already existing DOM element
 
+            } else if (node_kind === 'map') {
+                const cells_ids = node_data.map(datum => datum["map_cell_id"])
+                const cells_els = cells_ids.map(id => document.getElementById(cleanDOMId(id)))
+
+                for(v = 0; v < cells_els.length; v++) {
+                    const cell_el = cells_els[i]
+                    const next_node = node_data[i]
+
+                    cell_el.addEventListener("click", function() {
+                        const event = new CustomEvent("advance_story", {
+                            detail: {
+                                next_story_node: next_node.next_story_node,
+                                next_templates_paths: next_node.next_templates_paths
+                            }
+                        })
+                        // hide map on interaction with it
+                        this.map_el.setAttribute("active", false)
+                        ui.dispatchEvent(event);
+                    }.bind(this))
+                }
             }
         }
-
         ui.appendChild(ul);
         body.appendChild(ui);
     }
@@ -723,7 +743,6 @@ const ui = function() {
     this.show_node = function(nodeId) {
         const ui = document.getElementById("story-ui")
         const current_node = ui.querySelector("li[active=true]");
-
         // hide current node
         if(current_node) current_node.setAttribute("active", false)
 
