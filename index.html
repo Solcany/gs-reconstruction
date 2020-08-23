@@ -23,15 +23,19 @@
                 <a-asset-item id="graffiti-pcd" src="./assets/models/graffiti1_55k_verts.pcd" response-type="arraybuffer"></a-asset-item>
                 <a-asset-item id="car-pcd" src="./assets/models/thecar_80k_verts.pcd" response-type="arraybuffer"></a-asset-item>
                 <!-- SOUND -->
-                <audio id="click-mp3" src="./assets/sound/click.mp3" preload="auto"></audio>
-                <audio id="doctor-mp3" src="./assets/sound/doctor.mp3" preload="auto"></audio>
+                <audio id="click-mp3" src="./assets/sound/click.mp3" preload="auto" crossorigin="anonymous"></audio>
+                <audio id="doctor-mp3" src="./assets/sound/doctor.mp3" preload="auto" crossorigin="anonymous"></audio>
+                <audio id="voice1-mp3" src="./assets/sound/speechtest.mp3" preload="auto"crossorigin="anonymous"></audio>
+
+                <asset >
             </a-assets>
 
             <!-- interaction -->
             <a-entity id="keyboard-emitter" keyboard-event-emitter></a-entity>
 
             <!-- sound -->
-            <a-sound id="audio-player" src="null" positional="false"></a-sound>
+            <a-sound id="ambience-player" src="null" positional="false"></a-sound>
+            <a-sound id="voiceover-player" src="null" positional="false"></a-sound>
 
             <!-- scene objects -->
             <!-- always set scene objects parameters in the template file -->
@@ -40,13 +44,17 @@
                       position="0 0 0"
                       template-changer="interactionEmitterId: #story-ui;
                                         interactionEvent: advance_story;
-                                        templatePathKind: background">
+                                        templatePathKind: background;
+                          				parseAudio: false">
             </a-entity>
 
             <a-entity template="src: ./assets/scenes/scene1/objects/man.template"
                       template-changer="interactionEmitterId: #story-ui;
                                         interactionEvent: advance_story;
-                                        templatePathKind: foreground">
+                                		templatePathKind: foreground;
+            							parseAudio: true;
+                                		audioPlayersIDs: #ambience-player, #voiceover-player;
+                                		audioKinds: audio-ambient, audio-voiceover">
 
             </a-entity>
 
