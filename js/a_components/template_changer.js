@@ -10,8 +10,6 @@ const register_template_changer = function() {
       audioPlayersIDs: {type: 'array', default: []},
       audioKinds: {type: 'array', default: []}
    },
-
-    // emitts: 'template_set'
     init: function () {
       const emId = cleanDOMId(this.data.interactionEmitterId)
       this.iEvent = this.data.interactionEvent
@@ -26,7 +24,13 @@ const register_template_changer = function() {
         }.bind(this), 500)
       }
     },
-
+    set_template: function(path) {
+      this.el.setAttribute('template', 'src', path);
+      // wait 100 ms before emitting the 'set' event
+      setTimeout(
+        function() { this.el.emit('template_set', null, false) }.bind(this)
+        ,100)
+    },
     handle_interaction: function() {
       this.iEmitter.addEventListener(this.iEvent, function(ev) {
         const template_path = ev.detail.next_templates_paths[this.templatePathKind]
@@ -36,14 +40,6 @@ const register_template_changer = function() {
           return;
         }
       }.bind(this))
-    },
-
-    set_template: function(path) {
-      this.el.setAttribute('template', 'src', path);
-      // wait 100 ms before emitting the 'set' event
-      setTimeout(
-        function() { this.el.emit('template_set', null, false) }.bind(this)
-        ,100)
     },
 
     handle_audio: function() {
@@ -69,17 +65,14 @@ const register_template_changer = function() {
       }
 
       const playAudio = function(audioPlayer, audioKind) {
-        console.log("sound!");
         // get the html content of the currently loaded aframe template
         const audio = data.filter(datum => datum.getAttribute('kind') === audioKind)// === 'audio')
         if(audio.length === 0) console.warn("this template has no audio attached")
         //play attached audio (if there's any in the template)
         if(audio.length > 0) {
-          console.log("there should be sound")
           // WIP: currently plays only the first audio source in the template
           const src = audio[0].getAttribute('data')
           audioPlayer.el.setAttribute('sound','src', src);
-          console.log(audioPlayer);
           audioPlayer.playSound();
         } else {
           return;
@@ -89,10 +82,15 @@ const register_template_changer = function() {
       for(u = 0; u < audioPlayers.length; u++) {
         const audioPlayer = audioPlayers[u]
         const audioKind = audioKinds[u]
-
         this.el.addEventListener('template_set', function() {
           audioPlayer.stopSound();
           playAudio(audioPlayer, audioKind)}, false);
+
+        if(audioKind === 'audio-voiceover') {
+          audioPlayer.el.addEventListener('sound-ended', function() {
+            this.el.emit("show ui")
+          }.bind(this))
+        }
       }
     }
 

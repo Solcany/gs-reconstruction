@@ -254,8 +254,6 @@ const register_template_changer = function() {
       audioPlayersIDs: {type: 'array', default: []},
       audioKinds: {type: 'array', default: []}
    },
-
-    // emitts: 'template_set'
     init: function () {
       const emId = cleanDOMId(this.data.interactionEmitterId)
       this.iEvent = this.data.interactionEvent
@@ -270,7 +268,13 @@ const register_template_changer = function() {
         }.bind(this), 500)
       }
     },
-
+    set_template: function(path) {
+      this.el.setAttribute('template', 'src', path);
+      // wait 100 ms before emitting the 'set' event
+      setTimeout(
+        function() { this.el.emit('template_set', null, false) }.bind(this)
+        ,100)
+    },
     handle_interaction: function() {
       this.iEmitter.addEventListener(this.iEvent, function(ev) {
         const template_path = ev.detail.next_templates_paths[this.templatePathKind]
@@ -280,14 +284,6 @@ const register_template_changer = function() {
           return;
         }
       }.bind(this))
-    },
-
-    set_template: function(path) {
-      this.el.setAttribute('template', 'src', path);
-      // wait 100 ms before emitting the 'set' event
-      setTimeout(
-        function() { this.el.emit('template_set', null, false) }.bind(this)
-        ,100)
     },
 
     handle_audio: function() {
@@ -313,17 +309,14 @@ const register_template_changer = function() {
       }
 
       const playAudio = function(audioPlayer, audioKind) {
-        console.log("sound!");
         // get the html content of the currently loaded aframe template
         const audio = data.filter(datum => datum.getAttribute('kind') === audioKind)// === 'audio')
         if(audio.length === 0) console.warn("this template has no audio attached")
         //play attached audio (if there's any in the template)
         if(audio.length > 0) {
-          console.log("there should be sound")
           // WIP: currently plays only the first audio source in the template
           const src = audio[0].getAttribute('data')
           audioPlayer.el.setAttribute('sound','src', src);
-          console.log(audioPlayer);
           audioPlayer.playSound();
         } else {
           return;
@@ -333,10 +326,15 @@ const register_template_changer = function() {
       for(u = 0; u < audioPlayers.length; u++) {
         const audioPlayer = audioPlayers[u]
         const audioKind = audioKinds[u]
-
         this.el.addEventListener('template_set', function() {
           audioPlayer.stopSound();
           playAudio(audioPlayer, audioKind)}, false);
+
+        if(audioKind === 'audio-voiceover') {
+          audioPlayer.el.addEventListener('sound-ended', function() {
+            this.el.emit("show ui")
+          }.bind(this))
+        }
       }
     }
 
@@ -503,11 +501,13 @@ const register_a_data = function() {
     // Defaults the ocean to be parallel to the ground.
     defaultComponents: {
       data: {data: null,
-             kind: null}
+             kind: null,
+             replayable: false}
     },
     mappings: {
       data: 'data.data',
-      kind: 'data.kind'
+      kind: 'data.kind',
+      replayable: 'data.replayable'
     }
   });
 }
@@ -669,17 +669,17 @@ const {cleanDOMId} = require('./utils.js')
 const {MULTISCENARIO_DATA} = require('../../assets/data/multiscenario_data.js')
 const INITIAL_NODE_ID = "dont_cas_me"
 const MAP_EL_ID = "mapgrid";
+const TEMPLATE_CHANGER_WITH_VOICEOVER_ID = "#template_changer";
 
 const ui = function() {
     this.ui_data = MULTISCENARIO_DATA
-
 
     this.init = function() {
         window.addEventListener('DOMContentLoaded', function() {
             // hide map
             this.map_el = document.getElementById(cleanDOMId(MAP_EL_ID))
             this.map_el.setAttribute("active", true)
-           
+
             this.create_ui();
             this.manage_ui();
         })
@@ -689,7 +689,7 @@ const ui = function() {
         const ui = document.getElementById("story-ui")
         ui.addEventListener("advance_story", function(e) {
             const next_node_id = e.detail.next_story_node
-            this.show_node(next_node_id);
+            this.show_node_(next_node_id);
         }.bind(this))
     }
 
@@ -771,6 +771,27 @@ const ui = function() {
         if(!next_node) throw new Error("nav node with id: " + nodeID + " wasnt found in story-ui")
         next_node.setAttribute("active", true)
     }
+
+    this.show_node_ = function(nodeId) {
+        const template_changer_el = document.getElementById(cleanDOMId(TEMPLATE_CHANGER_WITH_VOICEOVER_ID))
+
+        template_changer_el.addEventListener("show ui", function() {
+            const ui = document.getElementById("story-ui")
+            const current_node = ui.querySelector("li[active=true]");
+            // hide current node
+            if(current_node) current_node.setAttribute("active", false)
+
+            // show the next
+            const id = addHashToString(nodeId)
+            const next_node = ui.querySelector(id);
+            if(!next_node) throw new Error("nav node with id: " + nodeID + " wasnt found in story-ui")
+            next_node.setAttribute("active", true)
+        })
+    }
+
+
+
+
 
     this.init();
 }

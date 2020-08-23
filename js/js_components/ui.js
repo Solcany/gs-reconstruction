@@ -5,17 +5,17 @@ const {cleanDOMId} = require('./utils.js')
 const {MULTISCENARIO_DATA} = require('../../assets/data/multiscenario_data.js')
 const INITIAL_NODE_ID = "dont_cas_me"
 const MAP_EL_ID = "mapgrid";
+const TEMPLATE_CHANGER_WITH_VOICEOVER_ID = "#template_changer";
 
 const ui = function() {
     this.ui_data = MULTISCENARIO_DATA
-
 
     this.init = function() {
         window.addEventListener('DOMContentLoaded', function() {
             // hide map
             this.map_el = document.getElementById(cleanDOMId(MAP_EL_ID))
             this.map_el.setAttribute("active", true)
-           
+
             this.create_ui();
             this.manage_ui();
         })
@@ -25,7 +25,7 @@ const ui = function() {
         const ui = document.getElementById("story-ui")
         ui.addEventListener("advance_story", function(e) {
             const next_node_id = e.detail.next_story_node
-            this.show_node(next_node_id);
+            this.show_node_(next_node_id);
         }.bind(this))
     }
 
@@ -107,6 +107,27 @@ const ui = function() {
         if(!next_node) throw new Error("nav node with id: " + nodeID + " wasnt found in story-ui")
         next_node.setAttribute("active", true)
     }
+
+    this.show_node_ = function(nodeId) {
+        const template_changer_el = document.getElementById(cleanDOMId(TEMPLATE_CHANGER_WITH_VOICEOVER_ID))
+
+        template_changer_el.addEventListener("show ui", function() {
+            const ui = document.getElementById("story-ui")
+            const current_node = ui.querySelector("li[active=true]");
+            // hide current node
+            if(current_node) current_node.setAttribute("active", false)
+
+            // show the next
+            const id = addHashToString(nodeId)
+            const next_node = ui.querySelector(id);
+            if(!next_node) throw new Error("nav node with id: " + nodeID + " wasnt found in story-ui")
+            next_node.setAttribute("active", true)
+        })
+    }
+
+
+
+
 
     this.init();
 }
