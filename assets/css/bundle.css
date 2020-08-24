@@ -57,6 +57,27 @@ button {
   background: none;
 }
 
+div#nav_grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 10000000;
+}
+div#nav_grid[active=true] {
+  display: grid;
+}
+div#nav_grid[active=false] {
+  display: none;
+}
+div#nav_grid span.grid_cell {
+  border: 0.5px solid gray;
+}
+div#nav_grid span.grid_cell.active {
+  background-color: red;
+}
+
 a-scene {
   position: relative;
   z-index: 1;
@@ -79,12 +100,10 @@ nav#story-ui {
   width: 100%;
   z-index: 10000;
   height: 100px;
-  background-color: red;
 }
 nav#story-ui ul {
   position: relative;
   width: 100%;
-  background-color: red;
 }
 nav#story-ui ul li {
   position: absolute;

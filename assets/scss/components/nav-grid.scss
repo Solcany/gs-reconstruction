@@ -1,0 +1,24 @@
+div#nav_grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 10000000;
+
+    &[active='true'] {
+          display: grid;
+    }
+
+    &[active='false'] {
+          display: none;
+    }
+
+    span.grid_cell {
+        border: 0.5px solid gray;
+
+        &.active {
+            background-color: red;
+        }
+    }
+}

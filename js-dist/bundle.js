@@ -1,12 +1,25 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+const GRID_DATA = [
+    {index: 15,
+     render_active: false,
+     label: "story1",
+     event: "start_scene"},
+    {index: 43,
+     render_active: false,
+     label: "story2",
+     event: "start_scene"}]
+
+exports.GRID_DATA = GRID_DATA;
+
+},{}],2:[function(require,module,exports){
 const MULTISCENARIO_DATA = [
-    {node_meta: {kind: 'map', mapId: '#mapgrid'},
+    {node_meta: {kind: 'map', mapId: '#nav_grid'},
      overview:
-     [{map_cell_id: "#f",
+     [{map_cell_id: "#story1",
        next_story_node: "introduction",
        next_templates_paths: {background: "./assets/scenes/scene1/objects/man.template",
                               foreground: "./assets/scenes/scene1/objects/man.template"}},
-      {map_cell_id: "#ff",
+      {map_cell_id: "#story2",
        next_story_node: "introduction",
        next_templates_paths: {background: "./assets/scenes/scene1/objects/man.template",
                               foreground: "./assets/scenes/scene1/objects/man.template"}}]
@@ -34,7 +47,7 @@ const MULTISCENARIO_DATA = [
 
 exports.MULTISCENARIO_DATA = MULTISCENARIO_DATA
 
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 const {cleanDOMId} = require('../js_components/utils.js')
 
 // timeline controller component needs to be applied to the same DOM el as animation-timeline component
@@ -90,7 +103,7 @@ const register_animation_timeline_controller = function() {
 
 exports.register_animation_timeline_controller = register_animation_timeline_controller
 
-},{"../js_components/utils.js":12}],3:[function(require,module,exports){
+},{"../js_components/utils.js":14}],4:[function(require,module,exports){
 const {cleanDOMId} = require('../js_components/utils.js')
 
 // timeline controller component needs to be applied to the same DOM el as animation-timeline component
@@ -120,7 +133,7 @@ const register_camera_controller = function() {
 
 exports.register_camera_controller = register_camera_controller
 
-},{"../js_components/utils.js":12}],4:[function(require,module,exports){
+},{"../js_components/utils.js":14}],5:[function(require,module,exports){
 
 const register_keyframe_event_emitter = function() {
     AFRAME.registerComponent('keyboard-event-emitter', {
@@ -168,7 +181,7 @@ const register_keyframe_event_emitter = function() {
 
 exports.register_keyframe_event_emitter = register_keyframe_event_emitter
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 const PCDLoader = require("../libs/PCDLoader.js");
 
 const register_pcd_model = function() {
@@ -218,7 +231,7 @@ const register_pcd_model = function() {
 
 exports.register_pcd_model = register_pcd_model
 
-},{"../libs/PCDLoader.js":13}],6:[function(require,module,exports){
+},{"../libs/PCDLoader.js":15}],7:[function(require,module,exports){
 const {cleanDOMId} = require('../js_components/utils.js')
 
 const register_scene_drape = function() {
@@ -241,7 +254,7 @@ const register_scene_drape = function() {
 
 exports.register_scene_drape = register_scene_drape
 
-},{"../js_components/utils.js":12}],7:[function(require,module,exports){
+},{"../js_components/utils.js":14}],8:[function(require,module,exports){
 const {cleanDOMId} = require('../js_components/utils.js')
 
 const register_template_changer = function() {
@@ -342,7 +355,7 @@ const register_template_changer = function() {
 }
 exports.register_template_changer = register_template_changer
 
-},{"../js_components/utils.js":12}],8:[function(require,module,exports){
+},{"../js_components/utils.js":14}],9:[function(require,module,exports){
 const {loadJSON} = require('../js_components/utils.js')
 
 const register_template_switcher = function() {
@@ -495,7 +508,7 @@ const register_template_switcher = function() {
 }
 exports.register_template_switcher = register_template_switcher
 
-},{"../js_components/utils.js":12}],9:[function(require,module,exports){
+},{"../js_components/utils.js":14}],10:[function(require,module,exports){
 const register_a_data = function() {
   AFRAME.registerPrimitive('a-data', {
     // Defaults the ocean to be parallel to the ground.
@@ -514,7 +527,115 @@ const register_a_data = function() {
 
 exports.register_a_data = register_a_data
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
+//const {debounce} = require('./utils.js')
+const {GRID_DATA} = require('../../assets/data/grid_data.js')
+const GRID_COLUMNS_AMOUNT = 10
+
+
+const init_nav_grid = function() {
+    const get_screen_dimensions = function() {
+        const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
+        const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0)
+        return [vw, vh]
+    }
+
+    const get_scren_aspect_ratio = function() {
+        const dimensions = get_screen_dimensions();
+        const vw = dimensions[0];
+        const vh = dimensions[1];
+        return vh / vw;
+    }
+
+    const set_grid_dimensions = function(grid_el) {
+        const screen_aspect_ratio = get_scren_aspect_ratio();
+        const cells_per_col = GRID_COLUMNS_AMOUNT;
+        const cells_per_row = Math.round(cells_per_col * screen_aspect_ratio)
+
+        // set amount of cells per row and coll
+        grid_el.style.gridTemplateRows = "repeat(" + cells_per_row + ", 1fr)"
+        grid_el.style.gridTemplateColumns = "repeat(" + cells_per_col + ", 1fr)"
+    }
+
+    const populate_grid = function(grid_el) {
+        const screen_aspect_ratio = get_scren_aspect_ratio();
+        const cells_per_col = GRID_COLUMNS_AMOUNT;
+        const cells_per_row = Math.round(cells_per_col * screen_aspect_ratio)
+
+        // populate the grid
+        const cells_amount = cells_per_row * cells_per_col;
+
+        for(let i = 0; i < cells_amount; i++) {
+            // check if the grid cell has data available
+
+            let cell_data = null;
+            for (let u = 0; u < GRID_DATA.length; u++) {
+                let cell_index = GRID_DATA[u]["index"]
+
+                if(cell_index > cells_amount) {
+                    throw new Error("index of this active cell is outside of the dimensions of the grid.")
+                }
+
+                if(cell_index === i) {
+                    cell_data = GRID_DATA[u]
+                    break;
+                }
+            }
+            // create new empty cell
+            const cell = document.createElement('SPAN');
+            cell.classList.add('grid_cell')
+
+            if(cell_data) {
+                cell.classList.add('active')
+                cell.id = cell_data["label"]
+
+                const cell_label = document.createElement('span');
+                cell_label.innerHTML = cell_data["label"];
+
+                cell.appendChild(cell_label);
+
+                // make the cell clickable
+                cell.addEventListener("click", function() {
+                    const event = new CustomEvent(cell_data["event"]);
+                    cell.dispatchEvent(event)
+                })
+            }
+
+            grid_el.appendChild(cell);
+        }
+    }
+
+    const init = function() {
+        const body = document.getElementsByTagName('BODY')[0]
+        const grid_el = document.createElement('DIV')
+      	grid_el.id = "nav_grid"
+        set_grid_dimensions(grid_el);
+        populate_grid(grid_el);
+        grid_el.setAttribute('active', true)
+        body.append(grid_el)
+        // WIP: make grid responsive
+       // window.addEventListener('resize', debounce(set_grid_dimensions.bind(this, grid_el), 25))
+    }
+
+    window.addEventListener('DOMContentLoaded', function() {
+        init();
+        manage_nav_grid();
+    })
+}
+
+const manage_nav_grid = function() {
+    const grid_el = document.getElementById("nav_grid")
+    const grid_cell = grid_el.children[0];
+
+    grid_cell.addEventListener("click", function() {
+
+    })
+}
+
+
+exports.init_nav_grid = init_nav_grid;
+
+},{"../../assets/data/grid_data.js":1}],12:[function(require,module,exports){
 const {loadJSON} = require('../js_components/utils.js')
 
 const timeline_json_path = '../../assets/data/timeline.json'
@@ -661,14 +782,14 @@ const timeline = function() {
 
 exports.timeline = timeline
 
-},{"../js_components/utils.js":12}],11:[function(require,module,exports){
+},{"../js_components/utils.js":14}],13:[function(require,module,exports){
 // utils
 const {addHashToString} = require('./utils.js')
 const {cleanDOMId} = require('./utils.js')
 // vars
 const {MULTISCENARIO_DATA} = require('../../assets/data/multiscenario_data.js')
 const INITIAL_NODE_ID = "dont_cas_me"
-const MAP_EL_ID = "mapgrid";
+const MAP_EL_ID = "nav_grid";
 const TEMPLATE_CHANGER_WITH_VOICEOVER_ID = "#template_changer";
 
 const ui = function() {
@@ -679,7 +800,8 @@ const ui = function() {
             // hide map
             this.map_el = document.getElementById(cleanDOMId(MAP_EL_ID))
             this.map_el.setAttribute("active", true)
-
+            this.template_changer_el = document.getElementById(cleanDOMId(TEMPLATE_CHANGER_WITH_VOICEOVER_ID))
+            
             this.create_ui();
             this.manage_ui();
         })
@@ -689,7 +811,7 @@ const ui = function() {
         const ui = document.getElementById("story-ui")
         ui.addEventListener("advance_story", function(e) {
             const next_node_id = e.detail.next_story_node
-            this.show_node_(next_node_id);
+            this.show_node(next_node_id);
         }.bind(this))
     }
 
@@ -771,11 +893,9 @@ const ui = function() {
         if(!next_node) throw new Error("nav node with id: " + nodeID + " wasnt found in story-ui")
         next_node.setAttribute("active", true)
     }
-
+    
     this.show_node_ = function(nodeId) {
-        const template_changer_el = document.getElementById(cleanDOMId(TEMPLATE_CHANGER_WITH_VOICEOVER_ID))
-
-        template_changer_el.addEventListener("show ui", function() {
+        this.template_changer_el.addEventListener("show ui", function() {
             const ui = document.getElementById("story-ui")
             const current_node = ui.querySelector("li[active=true]");
             // hide current node
@@ -792,14 +912,14 @@ const ui = function() {
 
 
 
-
+    
     this.init();
 }
 
 
 exports.ui = ui
 
-},{"../../assets/data/multiscenario_data.js":1,"./utils.js":12}],12:[function(require,module,exports){
+},{"../../assets/data/multiscenario_data.js":2,"./utils.js":14}],14:[function(require,module,exports){
 const loadJSON = function(path, callback) {
 
     var xobj = new XMLHttpRequest();
@@ -834,7 +954,7 @@ exports.loadJSON = loadJSON
 exports.cleanDOMId = cleanDOMId
 exports.addHashToString = addHashToString
 
-},{}],13:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 /**
  * @author Filipe Caixeta / http://filipecaixeta.com.br
  * @author Mugen87 / https://github.com/Mugen87
@@ -1245,7 +1365,7 @@ PCDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 module.exports = PCDLoader;
 
-},{}],14:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 // aframe components
 const {register_pcd_model} = require("./a_components/pcd_model.js");
 const {register_template_switcher} = require("./a_components/template_switcher.js");
@@ -1258,9 +1378,11 @@ const {register_template_changer} = require("./a_components/template_changer.js"
 //aframe  primitives
 const {register_a_data} = require("./a_primitives/a_data.js")
 // js components
+//
+const {grid} = require("./js_components/nav_grid.js");
 const {ui} = require("./js_components/ui.js");
 const {timeline} = require("./js_components/timeline.js");
-
+const {init_nav_grid} = require("./js_components/nav_grid.js");
 (function () {
     //DOM
         
@@ -1275,8 +1397,9 @@ const {timeline} = require("./js_components/timeline.js");
     register_a_data();
 
     //DOM
+    init_nav_grid();
     ui();
 
 })()
 
-},{"./a_components/animation_timeline_controller.js":2,"./a_components/camera_controller.js":3,"./a_components/keyboard_event_emitter.js":4,"./a_components/pcd_model.js":5,"./a_components/scene_drape.js":6,"./a_components/template_changer.js":7,"./a_components/template_switcher.js":8,"./a_primitives/a_data.js":9,"./js_components/timeline.js":10,"./js_components/ui.js":11}]},{},[14]);
+},{"./a_components/animation_timeline_controller.js":3,"./a_components/camera_controller.js":4,"./a_components/keyboard_event_emitter.js":5,"./a_components/pcd_model.js":6,"./a_components/scene_drape.js":7,"./a_components/template_changer.js":8,"./a_components/template_switcher.js":9,"./a_primitives/a_data.js":10,"./js_components/nav_grid.js":11,"./js_components/timeline.js":12,"./js_components/ui.js":13}]},{},[16]);

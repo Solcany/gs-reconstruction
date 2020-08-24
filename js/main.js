@@ -10,9 +10,11 @@ const {register_template_changer} = require("./a_components/template_changer.js"
 //aframe  primitives
 const {register_a_data} = require("./a_primitives/a_data.js")
 // js components
+//
+const {grid} = require("./js_components/nav_grid.js");
 const {ui} = require("./js_components/ui.js");
 const {timeline} = require("./js_components/timeline.js");
-
+const {init_nav_grid} = require("./js_components/nav_grid.js");
 (function () {
     //DOM
         
@@ -27,6 +29,7 @@ const {timeline} = require("./js_components/timeline.js");
     register_a_data();
 
     //DOM
+    init_nav_grid();
     ui();
 
 })()

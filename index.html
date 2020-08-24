@@ -16,9 +16,11 @@
 
     </head>
     <body>
-        <a-scene debug background="color: #191a1c" vr-mode-ui="enabled: false">
+        <a-scene debug background="color: #000" vr-mode-ui="enabled: false">
             <a-assets>
                 <!-- PCD -->
+                <a-asset-item id="city-pcd" src="./assets/scenes/0_introduction/pcd/city4.pcd" response-type="arraybuffer"></a-asset-item>
+
                 <a-asset-item id="house-pcd" src="./assets/models/main_object(house1).pcd" response-type="arraybuffer"></a-asset-item>
                 <a-asset-item id="graffiti-pcd" src="./assets/models/graffiti1_55k_verts.pcd" response-type="arraybuffer"></a-asset-item>
                 <a-asset-item id="car-pcd" src="./assets/models/thecar_80k_verts.pcd" response-type="arraybuffer"></a-asset-item>
@@ -27,7 +29,6 @@
                 <audio id="doctor-mp3" src="./assets/sound/doctor.mp3" preload="auto" crossorigin="anonymous"></audio>
                 <audio id="voice1-mp3" src="./assets/sound/speechtest.mp3" preload="auto"crossorigin="anonymous"></audio>
 
-                <asset >
             </a-assets>
 
             <!-- interaction -->
@@ -39,17 +40,17 @@
 
             <!-- scene objects -->
             <!-- always set scene objects parameters in the template file -->
-            <a-entity id="main"
-                      template="src: ./assets/scenes/scene1/main-object.template"
-                      position="0 0 0"
-                      template-changer="interactionEmitterId: #story-ui;
-                                        interactionEvent: advance_story;
-                                        templatePathKind: background;
-                          				parseAudio: false">
-            </a-entity>
+            <!-- <a-entity id="main"
+                 template="src: ./assets/scenes/scene1/main-object.template"
+                 position="0 0 0"
+                 template-changer="interactionEmitterId: #story-ui;
+                 interactionEvent: advance_story;
+                 templatePathKind: background;
+                 parseAudio: false">
+                 </a-entity> -->
 
             <a-entity id="template_changer"
-                      template="src: ./assets/scenes/scene1/objects/man.template"
+                      template="src: ./assets/scenes/0_introduction/introduction.template"
                       template-changer="interactionEmitterId: #story-ui;
                                         interactionEvent: advance_story;
                                 		templatePathKind: foreground;
@@ -60,15 +61,9 @@
             </a-entity>
 
             <!-- main camera -->
-            <a-entity id="rig" geometry="primitive: box" look-at="#floor" position="-9 12 15">
+            <a-entity id="rig" geometry="primitive: box" look-at="#template_changer" position="-9 12 15">
                 <a-entity id="overview-camera" camera="zoom: 2;" rotation="0 180 0"></a-entity>
             </a-entity>
-
-            <a-plane id="floor" position="0 0 0" rotation="-90 0 0" width="4" height="4" color="#000000"></a-plane> -->
         </a-scene>
-        <div id="mapgrid">
-            <button type="button" id="f" class="testbutton">button 1</button>
-            <button type="button" id="ff" class="testbutton">button 2</button>
-        </div>
     </body>
 </html>

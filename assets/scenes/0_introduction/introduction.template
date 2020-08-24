@@ -1,0 +1,3 @@
+<a-data data="#voice1-mp3" kind="audio-voiceover"></a-data>
+<a-data data="#click-mp3" kind="audio-ambient"></a-data>
+<a-entity pcd-model="pcd: #city-pcd; point_size: 0.15" look-at="#overview-camera" rotation="0 0 0" position="0 0 0" scale="3 3 3"></a-entity>
